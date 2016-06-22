@@ -1,2 +1,3 @@
-# goalsapp
+# Goals.app
+
 Track your periodic goals
