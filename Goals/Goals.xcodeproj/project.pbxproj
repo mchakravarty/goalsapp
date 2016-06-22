@@ -9,11 +9,12 @@
 /* Begin PBXBuildFile section */
 		E7DE0CC41D1A73BC0053A00B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CC31D1A73BC0053A00B /* AppDelegate.swift */; };
 		E7DE0CC61D1A73BC0053A00B /* SummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CC51D1A73BC0053A00B /* SummaryViewController.swift */; };
-		E7DE0CC81D1A73BC0053A00B /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CC71D1A73BC0053A00B /* SecondViewController.swift */; };
 		E7DE0CCB1D1A73BC0053A00B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0CC91D1A73BC0053A00B /* Main.storyboard */; };
 		E7DE0CCD1D1A73BC0053A00B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0CCC1D1A73BC0053A00B /* Assets.xcassets */; };
 		E7DE0CD01D1A73BC0053A00B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0CCE1D1A73BC0053A00B /* LaunchScreen.storyboard */; };
 		E7DE0CDB1D1A73BC0053A00B /* GoalsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CDA1D1A73BC0053A00B /* GoalsTests.swift */; };
+		E7DE0CE81D1A83660053A00B /* Goals.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CE71D1A83660053A00B /* Goals.swift */; };
+		E7DE0CEA1D1A83E00053A00B /* GoalsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CE91D1A83E00053A00B /* GoalsDataSource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,7 +31,6 @@
 		E7DE0CC01D1A73BC0053A00B /* Goals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Goals.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7DE0CC31D1A73BC0053A00B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E7DE0CC51D1A73BC0053A00B /* SummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewController.swift; sourceTree = "<group>"; };
-		E7DE0CC71D1A73BC0053A00B /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
 		E7DE0CCA1D1A73BC0053A00B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E7DE0CCC1D1A73BC0053A00B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E7DE0CCF1D1A73BC0053A00B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -38,6 +38,8 @@
 		E7DE0CD61D1A73BC0053A00B /* GoalsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoalsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7DE0CDA1D1A73BC0053A00B /* GoalsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsTests.swift; sourceTree = "<group>"; };
 		E7DE0CDC1D1A73BC0053A00B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E7DE0CE71D1A83660053A00B /* Goals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Goals.swift; sourceTree = "<group>"; };
+		E7DE0CE91D1A83E00053A00B /* GoalsDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoalsDataSource.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +82,9 @@
 			isa = PBXGroup;
 			children = (
 				E7DE0CC31D1A73BC0053A00B /* AppDelegate.swift */,
+				E7DE0CE71D1A83660053A00B /* Goals.swift */,
+				E7DE0CE91D1A83E00053A00B /* GoalsDataSource.swift */,
 				E7DE0CC51D1A73BC0053A00B /* SummaryViewController.swift */,
-				E7DE0CC71D1A73BC0053A00B /* SecondViewController.swift */,
 				E7DE0CC91D1A73BC0053A00B /* Main.storyboard */,
 				E7DE0CCC1D1A73BC0053A00B /* Assets.xcassets */,
 				E7DE0CCE1D1A73BC0053A00B /* LaunchScreen.storyboard */,
@@ -206,8 +209,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7DE0CC81D1A73BC0053A00B /* SecondViewController.swift in Sources */,
 				E7DE0CC41D1A73BC0053A00B /* AppDelegate.swift in Sources */,
+				E7DE0CEA1D1A83E00053A00B /* GoalsDataSource.swift in Sources */,
+				E7DE0CE81D1A83660053A00B /* Goals.swift in Sources */,
 				E7DE0CC61D1A73BC0053A00B /* SummaryViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -342,6 +346,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Goals/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.justtesting.Goals;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -354,6 +359,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Goals/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.justtesting.Goals;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -406,6 +412,7 @@
 				E7DE0CE11D1A73BC0053A00B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E7DE0CE21D1A73BC0053A00B /* Build configuration list for PBXNativeTarget "GoalsTests" */ = {
 			isa = XCConfigurationList;
@@ -414,6 +421,7 @@
 				E7DE0CE41D1A73BC0053A00B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
