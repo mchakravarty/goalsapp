@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E72D64B81D2279E80042FFF8 /* Changes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E72D64B71D2279E80042FFF8 /* Changes.swift */; };
 		E7DE0CC41D1A73BC0053A00B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CC31D1A73BC0053A00B /* AppDelegate.swift */; };
 		E7DE0CC61D1A73BC0053A00B /* SummaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7DE0CC51D1A73BC0053A00B /* SummaryViewController.swift */; };
 		E7DE0CCB1D1A73BC0053A00B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0CC91D1A73BC0053A00B /* Main.storyboard */; };
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E72D64B71D2279E80042FFF8 /* Changes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Changes.swift; sourceTree = "<group>"; };
 		E7DE0CC01D1A73BC0053A00B /* Goals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Goals.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7DE0CC31D1A73BC0053A00B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E7DE0CC51D1A73BC0053A00B /* SummaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryViewController.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				E7DE0CC31D1A73BC0053A00B /* AppDelegate.swift */,
+				E72D64B71D2279E80042FFF8 /* Changes.swift */,
 				E7DE0CE71D1A83660053A00B /* Goals.swift */,
 				E7DE0CE91D1A83E00053A00B /* GoalsDataSource.swift */,
 				E7DE0CC51D1A73BC0053A00B /* SummaryViewController.swift */,
@@ -211,6 +214,7 @@
 			files = (
 				E7DE0CC41D1A73BC0053A00B /* AppDelegate.swift in Sources */,
 				E7DE0CEA1D1A83E00053A00B /* GoalsDataSource.swift in Sources */,
+				E72D64B81D2279E80042FFF8 /* Changes.swift in Sources */,
 				E7DE0CE81D1A83660053A00B /* Goals.swift in Sources */,
 				E7DE0CC61D1A73BC0053A00B /* SummaryViewController.swift in Sources */,
 			);

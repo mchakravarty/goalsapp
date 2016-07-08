@@ -14,27 +14,38 @@ private let size           = CGSize(width: 35, height: 35)
 
 class GoalsDataSource: NSObject {
 
+  var goals: Goals = []     // Cache the last model data we observed.
+
+  override init() {
+    super.init()
+
+    model.observe(withContext: self){ context, goals in
+      context.goals = goals
+    }
+  }
 }
 
 extension GoalsDataSource: UITableViewDataSource {
 
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 5
-  }
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return goals.count }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: kGoalTableCell) ?? UITableViewCell()
 
+    let idx = indexPath[0],
+        goal: Goal
+    if idx >= goals.startIndex && idx < goals.endIndex { goal = goals[idx] } else { goal = Goal() }
+
     let rect = CGRect(origin: CGPoint.zero, size: size),
         path = UIBezierPath(roundedRect: rect, cornerRadius: 8)
     UIGraphicsBeginImageContext(size)
-    UIColor.blue().setFill()
+    goal.colour.uiColor.setFill()
     path.fill()
     cell.imageView?.image = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
 
-    cell.textLabel?.text = "My Goal"
-    cell.detailTextLabel?.text = "Twice weekly"
+    cell.textLabel?.text       = goal.title
+    cell.detailTextLabel?.text = goal.frequencyPerInterval
     return cell
   }
 
