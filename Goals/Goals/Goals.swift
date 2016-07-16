@@ -64,16 +64,25 @@ struct Goal {
   init() { self = Goal(colour: .blue, title: "", interval: .daily, frequency: 1, active: false) }
 
   var frequencyPerInterval: String {
-    // FIXME: use NSNumberFormatter to print frequency in words
+    // FIXME: use NumberFormatter to print frequency in words
     return "\(frequency) \(interval.description)"
   }
+
+  /// Percentage towards achieving the goal in the current interval given a specific count of how often the task/activity
+  /// has been done in the current interval.
+  ///
+  func percentage(count: Int) -> Float { return Float(count) / Float(frequency) }
 }
 
-/// Specification of a collection of goals — complete, immutable model state.
+/// A goal and the progress towards that goal in an interval.
+///
+typealias GoalProgress = (goal: Goal, count: Int)
+
+/// Specification of a collection of goals with progress — complete, immutable model state.
 ///
 /// * The order of the goals in the array determines their order on the overview screen.
 ///
-typealias Goals = [Goal]
+typealias Goals = [GoalProgress]
 
 
 // MARK: -
@@ -88,7 +97,8 @@ enum GoalEdit {
 let edits = Changing<GoalEdit>()
 
   // FIXME: needs to be read from persistent store
-let initialGoals = [Goal(colour: .blue, title: "My Goal", interval: .daily, frequency: 3, active: true)]
+let initialGoals = [(goal:  Goal(colour: .blue, title: "My Goal", interval: .daily, frequency: 3, active: true),
+                     count: 1)]
 
 let model : Accumulating<GoalEdit, Goals> = edits.accumulate(startingFrom: initialGoals){ edit, currentGoals in
   // FIXME: actually apply the edits

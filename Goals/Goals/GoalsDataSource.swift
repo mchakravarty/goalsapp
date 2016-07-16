@@ -34,7 +34,7 @@ extension GoalsDataSource: UITableViewDataSource {
 
     let idx = indexPath[0],
         goal: Goal
-    if idx >= goals.startIndex && idx < goals.endIndex { goal = goals[idx] } else { goal = Goal() }
+    if idx >= goals.startIndex && idx < goals.endIndex { goal = goals[idx].goal } else { goal = Goal() }
 
     let rect = CGRect(origin: CGPoint.zero, size: size),
         path = UIBezierPath(roundedRect: rect, cornerRadius: 8)
