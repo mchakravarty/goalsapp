@@ -32,14 +32,14 @@ extension GoalsDataSource: UITableViewDataSource {
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: kGoalTableCell) ?? UITableViewCell()
 
-    let idx = indexPath[0],
+    let idx = indexPath[1],
         goal: Goal
     if idx >= goals.startIndex && idx < goals.endIndex { goal = goals[idx].goal } else { goal = Goal() }
 
     let rect = CGRect(origin: CGPoint.zero, size: size),
         path = UIBezierPath(roundedRect: rect, cornerRadius: 8)
     UIGraphicsBeginImageContext(size)
-    goal.colour.uiColor.setFill()
+    goal.colour.setFill()
     path.fill()
     cell.imageView?.image = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()

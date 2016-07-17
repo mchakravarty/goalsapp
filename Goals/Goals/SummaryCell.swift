@@ -9,7 +9,11 @@
 import UIKit
 
 
-private let percentageFormatter = NumberFormatter()
+private let percentageFormatter: NumberFormatter = { formatter in
+  formatter.multiplier  = NSNumber(value: 100)
+  formatter.numberStyle = .percent
+  return formatter
+  }(NumberFormatter())
 
 class SummaryCell: UICollectionViewCell {
 
@@ -18,7 +22,10 @@ class SummaryCell: UICollectionViewCell {
 
   func configure(goalProgress: GoalProgress) {
 
-    name?.text = goalProgress.goal.title
-    name?.text = percentageFormatter.string(from: NSNumber(value: goalProgress.goal.percentage(count: goalProgress.count)))
+    let percentageValue = goalProgress.goal.percentage(count: goalProgress.count)
+
+    name?.text            = goalProgress.goal.title
+    percentage?.text      = percentageFormatter.string(from: NSNumber(value: percentageValue))
+    percentage?.textColor = goalProgress.goal.colour
   }
 }

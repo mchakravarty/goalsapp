@@ -7,6 +7,8 @@
 //
 //  Simple event-based change propagation (FRP-style). This simplified API omits features, such as observing on specific
 //  GCD queues and temporary disabling of observers, to be easy to understand.
+//
+//  To be self-contained, we inline some general purpose definitions, such as `WeakBox` and `Either`.
 
 import Foundation
 
@@ -16,7 +18,7 @@ import Foundation
 /// Wrap an object reference such that is only weakly referenced. (This is, e.g., useful to have an array of object
 /// references that doesn't keep the referenced objects alive.)
 ///
-/// WARNING: Trying to use a struct, rather than a class here leads swiftc crashing.
+/// WARNING: Trying to use a struct, rather than a class here leads to swiftc crashing.
 final public class WeakBox<T: AnyObject> {     // aka Schrödinger's Box
   private weak var box: T?
   var unbox: T? { get { return box } }
@@ -38,6 +40,25 @@ struct WeakApply<T> {
 
 func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
   return lhs.arg === rhs.arg
+}
+
+
+// MARK: -
+// MARK: Either
+
+enum Either<S, T> {
+  case Left(S)
+  case Right(T)
+}
+
+
+// MARK: -
+// MARK: LeftRight
+
+class LeftRight {
+  let left:  AnyObject
+  let right: AnyObject
+  init(left: AnyObject, right: AnyObject) { self.left = left; self.right = right }
 }
 
 
@@ -69,20 +90,6 @@ protocol Observable: class {
   func observe<Context: AnyObject>(withContext context: Context, observer: (Context, ObservedValue) -> ()) -> ()
 
   /*
-  /// Register an observer together with a context object whose lifetime determines the duration of the observation.
-  ///
-  /// The context object is only stored using a weak reference.
-  ///
-  /// The observer will be called on the specified execution queue or, by the default, the main dispatch queue.
-  ///
-  func asyncObserveWithContext<Context: AnyObject>(context: Context,
-                               onQueue queue: dispatch_queue_t,
-                               observer: Context -> Value -> ()) -> Observation<Value>
-  //                                                     observer: Context -> Observer) -> Observation<Value>
-  // FIXME: See explanation above.
- */
-
-  /*
   /// Temporarily disable the given observation while performing the changes contained in the closure. Applications of
   /// this method can be nested.
   ///
@@ -96,7 +103,6 @@ protocol Observable: class {
 class Changing<Value>: Observable {
   typealias ObservedValue = Value
 
-//  typealias Observer<Context> = (Context, Value) -> ()
   typealias ContextualObserver = (Value) -> ()
 
   /// Registered observers
@@ -116,32 +122,13 @@ class Changing<Value>: Observable {
   ///
   private let retainedObservedObject: AnyObject?
 
-  /*
-  // Log info
-  //
-  private let logLevel:    Int    = NSUserDefaults.standardUserDefaults().integerForKey(kPreferenceChangesLogLevel)
-  private let creatorInfo: String   // Information about where an instance was created
 
-  private class func makeInfo(info: String, _ file: String, _ line: Int) -> String {
-    let filename = ((file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
-    return "\(info) [\(filename):\(line)]"
-  }
- */
+  init() { self.retainedObservedObject = nil }
 
-//  public init(info: String = #function, file: String = #file, line: Int = #line) {
-  init() {
-    self.retainedObservedObject = nil
-//    self.creatorInfo            = Changes.makeInfo(info, file, line)
-  }
-
-//  init(retainObservedObject: AnyObject, info: String = #function, file: String = #file, line: Int = #line) {
-  init(retainObservedObject: AnyObject) {
-    self.retainedObservedObject = retainObservedObject
-  }
+  init(retainObservedObject: AnyObject) { self.retainedObservedObject = retainObservedObject }
 
   /// Announce a change to all observers.
   ///
-//  public func announce(change: ChangeValue, info: String = #function, file: String = #file, line: Int = #line)
   func announce(change: Value)
   {
     for observer in observers {
@@ -171,22 +158,6 @@ class Changing<Value>: Observable {
   }
 
   /*
-  /// Register an observer together with a context object whose lifetime determines the duration of the observation.
-  ///
-  /// The context object is only stored using a weak reference.
-  ///
-  /// The observer will be called on the specified execution queue or, by default, on the main dispatch queue.
-  ///
-  public func asyncObserveWithContext<Context: AnyObject>(context: Context,
-                                      onQueue queue: dispatch_queue_t = dispatch_get_main_queue(),
-                                      observer: Context -> Observer)
-    -> Observation<Value>
-  {
-    let appliedObserver = WeakApply(curry{ context, change in dispatch_async(queue){ observer(context)(change) } }, context)
-    observers.append(appliedObserver)
-    return Observation(observer: appliedObserver)
-  }
-
   /// Temporarily disable the given observation while performing the changes contained in the closure. Applications of
   /// this method can be nested.
   ///
@@ -289,5 +260,29 @@ extension Observable {
     -> Accumulating<ObservedValue, Accumulator>
   {
     return Accumulating<ObservedValue, Accumulator>(observing: self, startingFrom: initial, accumulateWith: accumulate)
+  }
+
+  /// Merge two observation streams into one.
+  ///
+  /// The derived stream will cease to announce changes if the last reference to it has been dropped. (That does not
+  /// mean that it hasn't got any observers anymore, but that no other object keeps a strong reference to the stream
+  /// of changes itself.)
+  ///
+  func merge<ObservedRight: Observable>(right: ObservedRight)
+    -> Changing<Either<ObservedValue, ObservedRight.ObservedValue>>
+  {
+
+    typealias Change = Either<ObservedValue, ObservedRight.ObservedValue>
+
+    let changes = Changing<Change>(retainObservedObject: LeftRight(left: self, right: right))
+    self.observe(withContext: changes,
+                 observer: { changesContext, change in
+                  let leftChange: Change = .Left(change)
+                  changesContext.announce(change: leftChange) })
+    right.observe(withContext: changes,
+                  observer: { changesContext, change in
+                    let rightChange: Change = .Right(change)
+                    changesContext.announce(change: rightChange) })
+    return changes
   }
 }

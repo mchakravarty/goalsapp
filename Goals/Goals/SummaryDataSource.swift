@@ -35,12 +35,12 @@ extension SummaryDataSource: UICollectionViewDataSource {
     let cell = (collectionView.dequeueReusableCell(withReuseIdentifier: kSummaryCell, for: indexPath) as? SummaryCell) ??
                SummaryCell()
 
-    let idx = indexPath[0],
+    let idx = indexPath[1],
         goalProgress: GoalProgress
     if idx >= goals.startIndex && idx < goals.endIndex { goalProgress = goals[idx] }
     else { goalProgress = (goal: Goal(), count: 0) }
 
-    cell.configure(goal: goalProgress)
+    cell.configure(goalProgress: goalProgress)
     return cell
   }
 }

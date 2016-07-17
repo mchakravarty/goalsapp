@@ -15,17 +15,17 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.90196079019999997" alpha="1" colorSpace="calibratedRGB"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="XSV-h8-FyH">
-                            <size key="itemSize" width="150" height="150"/>
+                            <size key="itemSize" width="150" height="120"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
                             <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="SummaryCell" id="Y0a-II-juq" customClass="SummaryCell" customModule="Goals" customModuleProvider="target">
-                                <frame key="frameInset" width="150" height="150"/>
+                                <frame key="frameInset" width="150" height="120"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="150" height="120"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rWB-g7-skP">
@@ -64,7 +64,7 @@
             </objects>
             <point key="canvasLocation" x="750" y="-342"/>
         </scene>
-        <!--Table View Controller-->
+        <!--My Goals-->
         <scene sceneID="7Bl-bz-ELw">
             <objects>
                 <tableViewController id="Fqk-y6-q3g" sceneMemberID="viewController">
@@ -106,7 +106,12 @@
                             <outlet property="delegate" destination="Fqk-y6-q3g" id="3US-FC-VDB"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="sCc-vf-zhN"/>
+                    <navigationItem key="navigationItem" title="My Goals" id="sCc-vf-zhN">
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="CI1-OF-8J9"/>
+                        <connections>
+                            <outlet property="rightBarButtonItem" destination="CI1-OF-8J9" id="ITT-iB-nBq"/>
+                        </connections>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wsy-fa-8z7" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <customObject id="BTY-0h-7Ld" customClass="GoalsDataSource" customModule="Goals" customModuleProvider="target"/>
