@@ -113,23 +113,64 @@
             </objects>
             <point key="canvasLocation" x="1647.2" y="359.37031484257875"/>
         </scene>
-        <!--Task Detail-->
+        <!--Goal Detail-->
         <scene sceneID="ga7-ht-6SQ">
             <objects>
-                <viewController title="Task Detail" id="GYU-Kq-bPt" sceneMemberID="viewController">
+                <viewController title="Goal Detail" id="GYU-Kq-bPt" customClass="DetailController" customModule="Goals" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="19A-Vn-Beu"/>
                         <viewControllerLayoutGuide type="bottom" id="LMx-1J-iX5"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="0p9-NE-pZs">
+                    <view key="view" contentMode="scaleToFill" id="v5R-Rq-8RG">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Yoga" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s09-Ti-59X">
+                                <frame key="frameInset" minX="166" minY="253" width="42" height="21"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Monthly" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y9T-OC-eLD">
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="5 times/month" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hpj-fk-dzk">
+                                <frame key="frameInset" minX="129" minY="424" width="116" height="70"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dJR-VW-Wz1">
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="hhu-6N-0B5"/>
+                                    <constraint firstAttribute="height" constant="50" id="mIt-gc-FrX"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Hpj-fk-dzk" firstAttribute="top" secondItem="y9T-OC-eLD" secondAttribute="bottom" constant="53" id="0nP-B1-6yY"/>
+                            <constraint firstItem="y9T-OC-eLD" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="6lb-t6-lzU"/>
+                            <constraint firstItem="s09-Ti-59X" firstAttribute="top" secondItem="dJR-VW-Wz1" secondAttribute="bottom" constant="94" id="HTy-M6-OZ5"/>
+                            <constraint firstItem="Hpj-fk-dzk" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="WcO-kG-3r5"/>
+                            <constraint firstItem="y9T-OC-eLD" firstAttribute="top" secondItem="s09-Ti-59X" secondAttribute="bottom" constant="76" id="d7K-oY-Lzc"/>
+                            <constraint firstItem="dJR-VW-Wz1" firstAttribute="top" secondItem="19A-Vn-Beu" secondAttribute="bottom" constant="45" id="ogc-2N-jeo"/>
+                            <constraint firstItem="s09-Ti-59X" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="tZv-BB-8sR"/>
+                            <constraint firstItem="dJR-VW-Wz1" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="ygC-va-RKz"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="frequency" destination="Hpj-fk-dzk" id="q6a-Wf-xOv"/>
+                        <outlet property="goalColour" destination="dJR-VW-Wz1" id="Bi5-7N-ZeW"/>
+                        <outlet property="intervalLabel" destination="y9T-OC-eLD" id="mu2-jJ-cjO"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lrw-aK-DAs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2520" y="359"/>
+            <point key="canvasLocation" x="2519.1999999999998" y="358.4707646176912"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="yl2-sM-qoP">
