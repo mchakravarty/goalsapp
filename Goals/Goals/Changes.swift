@@ -19,7 +19,7 @@ import Foundation
 /// references that doesn't keep the referenced objects alive.)
 ///
 /// WARNING: Trying to use a struct, rather than a class here leads to swiftc crashing.
-final public class WeakBox<T: AnyObject> {     // aka Schrödinger's Box
+final class WeakBox<T: AnyObject> {     // aka Schrödinger's Box
   private weak var box: T?
   var unbox: T? { get { return box } }
   init(_ value: T) { self.box = value }
@@ -32,14 +32,14 @@ struct WeakApply<T> {
   private let arg: WeakBox<AnyObject>
   private let fun: (AnyObject) -> T
   var unbox: T? { get { return arg.unbox.map(fun) } }
-  init<S: AnyObject>(_ fun: (S) -> T, _ value: S) {
+  init<S: AnyObject>(_ fun: @escaping (S) -> T, _ value: S) {
     self.arg = WeakBox(value)
     self.fun = { fun(($0 as? S)!) }
   }
-}
 
-func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
-  return lhs.arg === rhs.arg
+  static func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
+    return lhs.arg === rhs.arg
+  }
 }
 
 
@@ -87,7 +87,7 @@ protocol Observable: class {
   ///
   /// The observer will be called on the same thread where a new value is announced.
   ///
-  func observe<Context: AnyObject>(withContext context: Context, observer: (Context, ObservedValue) -> ()) -> ()
+  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping (Context, ObservedValue) -> ()) -> ()
 
   /*
   /// Temporarily disable the given observation while performing the changes contained in the closure. Applications of
@@ -148,7 +148,7 @@ class Changing<Value>: Observable {
   ///
   /// The observer will be called on the same thread as the change announcement.
   ///
-  func observe<Context: AnyObject>(withContext context: Context, observer: (Context, ObservedValue) -> ()) -> ()
+  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping (Context, ObservedValue) -> ()) -> ()
 //    -> Observation<Value>
   {
     let appliedObserver = WeakApply({ (context: Context) in { (change: ObservedValue) in observer(context, change) }},
@@ -190,10 +190,10 @@ class Accumulating<Value, Accumulator>: Observable {
   /// accumulation function to the current accumulator value and the observed change to determine the new accumulator
   /// value.
   ///
-  init<Observed: Observable where Value == Observed.ObservedValue>
+  init<Observed: Observable>
     (observing observed: Observed,
      startingFrom initial: Accumulator,
-     accumulateWith accumulate: (Value, Accumulator) -> Accumulator)
+     accumulateWith accumulate: @escaping (Value, Accumulator) -> Accumulator) where Value == Observed.ObservedValue
   {
     retainedObserved = observed
     accumulator      = initial
@@ -213,7 +213,7 @@ class Accumulating<Value, Accumulator>: Observable {
   ///
   /// The observer will be called on the same thread as the change announcement.
   ///
-  func observe<Context: AnyObject>(withContext context: Context, observer: (Context, ObservedValue) -> ()) -> ()
+  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping (Context, ObservedValue) -> ()) -> ()
   {
     changes?.observe(withContext: context, observer: observer)
     observer(context, accumulator)
@@ -232,7 +232,7 @@ extension Observable {
   /// mean that it hasn't got any observers anymore, but that no other object keeps a strong reference to the stream
   /// of changes itself.)
   ///
-  func map<MappedValue>(transform: (ObservedValue) -> MappedValue) -> Changing<MappedValue> {
+  func map<MappedValue>(transform: @escaping (ObservedValue) -> MappedValue) -> Changing<MappedValue> {
 
     let changes = Changing<MappedValue>(retainObservedObject: self)
     observe(withContext: changes,
@@ -246,7 +246,7 @@ extension Observable {
   /// mean that it hasn't got any observers anymore, but that no other object keeps a strong reference to the stream
   /// of triggers itself.)
   ///
-  func filter(predicate: (ObservedValue) -> Bool) -> Changing<ObservedValue> {
+  func filter(predicate: @escaping (ObservedValue) -> Bool) -> Changing<ObservedValue> {
 
     let changes = Changing<ObservedValue>(retainObservedObject: self)
     self.observe(withContext: changes,
@@ -256,7 +256,7 @@ extension Observable {
   }
 
   func accumulate<Accumulator>(startingFrom initial: Accumulator,
-                               accumulateWith accumulate: (ObservedValue, Accumulator) -> Accumulator)
+                               accumulateWith accumulate: @escaping (ObservedValue, Accumulator) -> Accumulator)
     -> Accumulating<ObservedValue, Accumulator>
   {
     return Accumulating<ObservedValue, Accumulator>(observing: self, startingFrom: initial, accumulateWith: accumulate)

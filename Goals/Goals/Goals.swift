@@ -31,7 +31,7 @@ import UIKit
 
 /// The set of colours that might be used to render goals.
 ///
-let goalColours: [UIColor] = [.blue(), .cyan(), .green(), .yellow(), .orange(), .red(), .purple()]
+let goalColours: [UIColor] = [.blue, .cyan, .green, .yellow, .orange, .red, .purple]
 
 enum GoalInterval: CustomStringConvertible {
   case daily, weekly, monthly
@@ -62,7 +62,7 @@ struct Goal {
     self.active    = active
   }
 
-  init() { self = Goal(colour: .blue(), title: "", interval: .daily, frequency: 1, active: false) }
+  init() { self = Goal(colour: .blue, title: "", interval: .daily, frequency: 1, active: false) }
 
   var frequencyPerInterval: String {
     // FIXME: use NumberFormatter to print frequency in words
@@ -98,11 +98,11 @@ enum GoalEdit {
 let edits = Changing<GoalEdit>()
 
   // FIXME: needs to be read from persistent store
-let initialGoals = [ (goal:  Goal(colour: .blue(), title: "Yoga", interval: .monthly, frequency: 5, active: true),
+let initialGoals = [ (goal:  Goal(colour: .blue, title: "Yoga", interval: .monthly, frequency: 5, active: true),
                       count: 3)
-                   , (goal:  Goal(colour: .orange(), title: "Walks", interval: .weekly, frequency: 3, active: true),
+                   , (goal:  Goal(colour: .orange, title: "Walks", interval: .weekly, frequency: 3, active: true),
                       count: 0)
-                   , (goal:  Goal(colour: .purple(), title: "Stretching", interval: .daily, frequency: 3, active: true),
+                   , (goal:  Goal(colour: .purple, title: "Stretching", interval: .daily, frequency: 3, active: true),
                       count: 1)
                    ]
 
