@@ -60,7 +60,11 @@
                     <tabBarItem key="tabBarItem" title="Summary" image="first" id="z3s-n3-b2k"/>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PpG-Ck-YQl" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <customObject id="haG-MU-w3U" customClass="SummaryDataSource" customModule="Goals" customModuleProvider="target"/>
+                <customObject id="haG-MU-w3U" customClass="SummaryDataSource" customModule="Goals" customModuleProvider="target">
+                    <connections>
+                        <outlet property="collectionView" destination="VjL-5T-Os6" id="HBW-cV-cnl"/>
+                    </connections>
+                </customObject>
             </objects>
             <point key="canvasLocation" x="750" y="-342"/>
         </scene>

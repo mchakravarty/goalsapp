@@ -13,6 +13,7 @@ private let kSummaryCell = "SummaryCell"
 
 class SummaryDataSource: NSObject {
 
+  @IBOutlet weak var collectionView: UICollectionView?
   var goals: Goals = []     // Cache the last model data we observed.
 
   override init() {
@@ -20,6 +21,7 @@ class SummaryDataSource: NSObject {
 
     model.observe(withContext: self){ context, goals in
       context.goals = goals
+      context.collectionView?.reloadData()
     }
   }
 }

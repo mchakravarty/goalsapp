@@ -187,9 +187,9 @@ typealias Triggers = Changing<()>
 class Accumulating<Value, Accumulator>: Observable {
   typealias ObservedValue = Accumulator
 
-  private      let retainedObserved: AnyObject                // This is to keep the observed object alive.
-  private      var accumulator:      Accumulator              // Encapsulated accumulator value
-  private weak var changes:          Changing<Accumulator>?   // Stream of accumulator changes
+  private let retainedObserved: AnyObject                // This is to keep the observed object alive.
+  private var accumulator:      Accumulator              // Encapsulated accumulator value
+  private var changes:          Changing<Accumulator>?   // Stream of accumulator changes
 
   /// Constructs an accumulator with the given initial value, which is fed by an observed object by applying an
   /// accumulation function to the current accumulator value and the observed change to determine the new accumulator
@@ -202,7 +202,7 @@ class Accumulating<Value, Accumulator>: Observable {
   {
     retainedObserved = observed
     accumulator      = initial
-    changes          = Changing<Accumulator>(retainObservedObject: self)
+    changes          = Changing<Accumulator>()
 
     observed.observe(withContext: self){ (context: Accumulating<Value, ObservedValue>, value: Value) in
       context.accumulator = accumulate(value, context.accumulator)
