@@ -18,11 +18,14 @@ import Foundation
 /// Wrap an object reference such that is only weakly referenced. (This is, e.g., useful to have an array of object
 /// references that doesn't keep the referenced objects alive.)
 ///
-/// WARNING: Trying to use a struct, rather than a class here leads to swiftc crashing.
-final class WeakBox<T: AnyObject> {     // aka Schrödinger's Box
+struct WeakBox<T: AnyObject> {     // aka Schrödinger's Box
   private weak var box: T?
   var unbox: T? { get { return box } }
   init(_ value: T) { self.box = value }
+
+//  static func ===<T>(lhs: WeakBox<T>, rhs: WeakBox<T>) -> Bool {
+//    return lhs.box === rhs.box
+//  }
 }
 
 /// Delayed application of a function to a value, where the application is only computed if the weakly referenced
@@ -37,9 +40,11 @@ struct WeakApply<T> {
     self.fun = { fun(($0 as? S)!) }
   }
 
-  static func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
-    return lhs.arg === rhs.arg
-  }
+//  /// Two weak applications are considered equivalent if they wrap the same argument (the function is not considered).
+//  ///
+//  static func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
+//    return lhs.arg === rhs.arg
+//  }
 }
 
 
