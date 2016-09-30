@@ -13,7 +13,8 @@ private let kSummaryCell = "SummaryCell"
 
 class SummaryDataSource: NSObject {
 
-  @IBOutlet weak var collectionView: UICollectionView?
+  @IBOutlet private weak var collectionView: UICollectionView?
+
   var goals: Goals = []     // Cache the last model data we observed.
 
   override init() {

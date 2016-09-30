@@ -11,6 +11,8 @@ import Foundation
 import UIKit
 
 
+// MARK: Model data structures
+
 /// The set of colours that might be used to render goals.
 ///
 let goalColours: [UIColor] = [.blue, .cyan, .green, .yellow, .orange, .red, .purple]
@@ -76,24 +78,34 @@ typealias Goals = [GoalProgress]
 
 
 // MARK: -
-// MARK: Model store
+// MARK: Model edits
 
 /// This type encompases all transformations that may be applied to everything but the progress counts in values of
 /// type `Goals`.
 ///
 enum GoalEdit {
   case delete(goal: Goal)
+  case update(goal: Goal)
 }
 
 extension GoalEdit {
   func transform(_ goals: Goals) -> Goals {
     switch self {
-    case .delete(let goal): return goals.filter{ !($0.goal === goal) }
+    case .delete(let goal):    return goals.filter{ !($0.goal === goal) }
+    case .update(let newGoal): return goals.map{ (goal: Goal, count: Int) in
+      return (goal === newGoal) ? (goal: newGoal, count: count) : (goal: goal, count: count) }
     }
   }
 }
 
-/// We keep things simple here...
+
+// MARK: -
+// MARK: Model store
+
+// NB: This is overly simplistic, keeping all the observables as toplevel values that can be accessed from anywhere in
+//     the app. In production code, you want to restrict access and permission to announce edits to individual
+//     subsystems of the app by passing the observables into only those data sources, views, or controllers that need
+//     the corresponding access.
 
 /// Type of a stream of goal edits.
 ///

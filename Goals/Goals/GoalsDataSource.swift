@@ -14,6 +14,8 @@ private let size           = CGSize(width: 35, height: 35)
 
 class GoalsDataSource: NSObject {
 
+  @IBOutlet private weak var tableView: UITableView?
+
   fileprivate var goals: Goals = []     // Cache the last model data we observed.
 
   override init() {
@@ -21,6 +23,7 @@ class GoalsDataSource: NSObject {
 
     model.observe(withContext: self){ context, goals in
       context.goals = goals
+      context.tableView?.reloadData()
     }
   }
 

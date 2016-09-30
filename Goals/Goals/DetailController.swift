@@ -11,10 +11,11 @@ import UIKit
 
 class DetailController: UIViewController {
 
-  @IBOutlet private weak var titleLabel:    UILabel!
-  @IBOutlet private weak var intervalLabel: UILabel!
-  @IBOutlet private weak var frequency:     UILabel!
-  @IBOutlet private weak var colour:        UIImageView?
+  @IBOutlet fileprivate weak var titleLabel:     UILabel!
+  @IBOutlet fileprivate weak var titleTextField: UITextField!
+  @IBOutlet fileprivate weak var intervalLabel:  UILabel!
+  @IBOutlet fileprivate weak var frequency:      UILabel!
+  @IBOutlet fileprivate weak var colour:         UIImageView?
 
   /// The goal presented and edited by this view controller.
   ///
@@ -30,20 +31,31 @@ class DetailController: UIViewController {
     intervalLabel.text      = goal?.interval.description
     frequency.text          = goal?.frequencyPerInterval
     colour?.backgroundColor = goal?.colour
-//    let size = goalColour?.bounds.size ?? CGSize.zero,
-//    rect = CGRect(origin: CGPoint.zero, size: size),
-//    path = UIBezierPath(roundedRect: rect, cornerRadius: 8)
-//    UIGraphicsBeginImageContext(size)
-//    //    goal.colour.setFill()
-//    UIColor.blue().setFill()
-//    path.fill()
-//    goalColour?.image = UIGraphicsGetImageFromCurrentImageContext()
-//    UIGraphicsEndImageContext()
+
+    titleTextField.isHidden = true
+  }
+}
+
+// TODO: Add support to edit the other properties of a goal.
+
+extension DetailController {
+
+  @IBAction func tappedTitle(_ sender: AnyObject) {
+    titleTextField.text     = goal?.title
+    titleTextField.isHidden = false
+    titleLabel.isHidden     = true
+
+    titleTextField.becomeFirstResponder()
   }
 
+  @IBAction func titleFinishedEditing(_ sender: AnyObject) {
+    let newTitle = titleTextField.text ?? ""
+    goal?.title             = newTitle
+    navigationItem.title    = newTitle
+    titleLabel.text         = newTitle
+    titleTextField.isHidden = true
+    titleLabel.isHidden     = false
 
-//  // MARK: - Interacting with Storyboards and Segues
-//
-//  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//  }
+    if let goal = goal { edits.announce(change: .update(goal: goal)) }
+  }
 }

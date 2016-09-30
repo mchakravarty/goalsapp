@@ -113,7 +113,11 @@
                     <navigationItem key="navigationItem" title="My Goals" id="sCc-vf-zhN"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wsy-fa-8z7" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <customObject id="BTY-0h-7Ld" customClass="GoalsDataSource" customModule="Goals" customModuleProvider="target"/>
+                <customObject id="BTY-0h-7Ld" customClass="GoalsDataSource" customModule="Goals" customModuleProvider="target">
+                    <connections>
+                        <outlet property="tableView" destination="25l-5I-ImY" id="HFz-A8-F8Q"/>
+                    </connections>
+                </customObject>
             </objects>
             <point key="canvasLocation" x="1647.2" y="359.37031484257875"/>
         </scene>
@@ -129,11 +133,23 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Yoga" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s09-Ti-59X">
+                            <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Yoga" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s09-Ti-59X">
+                                <gestureRecognizers/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="exY-Gl-q2a" appends="YES" id="8q8-xI-dyc"/>
+                                </connections>
                             </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Yoga" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="XWs-K8-bLc">
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <action selector="titleFinishedEditing:" destination="GYU-Kq-bPt" eventType="primaryActionTriggered" id="jF9-an-FWU"/>
+                                </connections>
+                            </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Monthly" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y9T-OC-eLD">
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -155,10 +171,14 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="Hpj-fk-dzk" firstAttribute="top" secondItem="y9T-OC-eLD" secondAttribute="bottom" constant="53" id="0nP-B1-6yY"/>
+                            <constraint firstItem="XWs-K8-bLc" firstAttribute="height" secondItem="s09-Ti-59X" secondAttribute="height" id="3ai-Uc-hLF"/>
                             <constraint firstItem="y9T-OC-eLD" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="6lb-t6-lzU"/>
+                            <constraint firstItem="XWs-K8-bLc" firstAttribute="width" secondItem="s09-Ti-59X" secondAttribute="width" id="7LB-6a-rDV"/>
                             <constraint firstItem="s09-Ti-59X" firstAttribute="top" secondItem="dJR-VW-Wz1" secondAttribute="bottom" constant="94" id="HTy-M6-OZ5"/>
                             <constraint firstItem="Hpj-fk-dzk" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="WcO-kG-3r5"/>
                             <constraint firstItem="y9T-OC-eLD" firstAttribute="top" secondItem="s09-Ti-59X" secondAttribute="bottom" constant="76" id="d7K-oY-Lzc"/>
+                            <constraint firstItem="XWs-K8-bLc" firstAttribute="centerY" secondItem="s09-Ti-59X" secondAttribute="centerY" id="g3z-6k-CL1"/>
+                            <constraint firstItem="XWs-K8-bLc" firstAttribute="centerX" secondItem="s09-Ti-59X" secondAttribute="centerX" id="lpF-tU-f7n"/>
                             <constraint firstItem="dJR-VW-Wz1" firstAttribute="top" secondItem="19A-Vn-Beu" secondAttribute="bottom" constant="45" id="ogc-2N-jeo"/>
                             <constraint firstItem="s09-Ti-59X" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="tZv-BB-8sR"/>
                             <constraint firstItem="dJR-VW-Wz1" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="ygC-va-RKz"/>
@@ -171,9 +191,15 @@
                         <outlet property="intervalLabel" destination="y9T-OC-eLD" id="mu2-jJ-cjO"/>
                         <outlet property="navigationItem" destination="L73-nN-btm" id="Y0H-k4-0yc"/>
                         <outlet property="titleLabel" destination="s09-Ti-59X" id="tUr-kt-i2T"/>
+                        <outlet property="titleTextField" destination="XWs-K8-bLc" id="2wl-mD-Ldq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lrw-aK-DAs" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="exY-Gl-q2a">
+                    <connections>
+                        <action selector="tappedTitle:" destination="GYU-Kq-bPt" id="ITT-BO-1Uz"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="2519.1999999999998" y="358.4707646176912"/>
         </scene>

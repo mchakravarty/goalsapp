@@ -17,14 +17,9 @@ class GoalsController: UITableViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-      // Preserve selection between presentations
-    self.clearsSelectionOnViewWillAppear = false
-
       // Display an Edit button in the navigation bar for this view controller.
     self.navigationItem.rightBarButtonItem = self.editButtonItem
   }
-
-  override func didReceiveMemoryWarning() { super.didReceiveMemoryWarning() }
 
   /*
   // Override to support conditional editing of the table view.
