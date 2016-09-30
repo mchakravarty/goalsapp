@@ -26,8 +26,8 @@ class GoalsDataSource: NSObject {
 
   /// Retrieve the goal at the given index path in the model data, if available.
   ///
-  fileprivate func goal(at indexPath: IndexPath) -> Goal? {
-    let idx = indexPath[1]
+  func goal(at indexPath: IndexPath) -> Goal? {
+    let idx = indexPath.item
     if idx >= goals.startIndex && idx < goals.endIndex { return goals[idx].goal } else { return nil }
   }
 }

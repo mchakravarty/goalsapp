@@ -101,7 +101,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="GYU-Kq-bPt" kind="show" action="showDetailViewController:sender:" id="OBg-ur-DZ5"/>
+                                    <segue destination="GYU-Kq-bPt" kind="show" identifier="ShowGoalDetail" id="jer-y7-l6D"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -164,10 +164,13 @@
                             <constraint firstItem="dJR-VW-Wz1" firstAttribute="centerX" secondItem="v5R-Rq-8RG" secondAttribute="centerX" id="ygC-va-RKz"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Goal Detail" id="L73-nN-btm"/>
                     <connections>
+                        <outlet property="colour" destination="dJR-VW-Wz1" id="smO-WF-AGj"/>
                         <outlet property="frequency" destination="Hpj-fk-dzk" id="q6a-Wf-xOv"/>
-                        <outlet property="goalColour" destination="dJR-VW-Wz1" id="Bi5-7N-ZeW"/>
                         <outlet property="intervalLabel" destination="y9T-OC-eLD" id="mu2-jJ-cjO"/>
+                        <outlet property="navigationItem" destination="L73-nN-btm" id="Y0H-k4-0yc"/>
+                        <outlet property="titleLabel" destination="s09-Ti-59X" id="tUr-kt-i2T"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lrw-aK-DAs" userLabel="First Responder" sceneMemberID="firstResponder"/>

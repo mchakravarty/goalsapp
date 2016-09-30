@@ -9,6 +9,9 @@
 import UIKit
 
 
+let kShowGoalDetail = "ShowGoalDetail"    // Segue identifier
+
+
 class GoalsController: UITableViewController {
 
   override func viewDidLoad() {
@@ -58,13 +61,15 @@ class GoalsController: UITableViewController {
   }
   */
 
-  /*
-  // MARK: - Navigation
+  // MARK: - Interacting with Storyboards and Segues
 
-  // In a storyboard-based application, you will often want to do a little preparation before navigation
-  override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
-      // Get the new view controller using segue.destinationViewController.
-      // Pass the selected object to the new view controller.
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    guard let goalsDataSource = tableView.dataSource as? GoalsDataSource,
+          let indexPath       = tableView.indexPathForSelectedRow else { return }
+
+    if segue.identifier == kShowGoalDetail, let detailController = segue.destination as? DetailController {
+
+      detailController.goal = goalsDataSource.goal(at: indexPath)
+    }
   }
-  */
 }

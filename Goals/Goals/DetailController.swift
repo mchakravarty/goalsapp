@@ -11,16 +11,25 @@ import UIKit
 
 class DetailController: UIViewController {
 
-  @IBOutlet private weak var titleLabel: UILabel!
+  @IBOutlet private weak var titleLabel:    UILabel!
   @IBOutlet private weak var intervalLabel: UILabel!
-  @IBOutlet private weak var frequency: UILabel!
-  @IBOutlet private weak var goalColour: UIImageView?
+  @IBOutlet private weak var frequency:     UILabel!
+  @IBOutlet private weak var colour:        UIImageView?
+
+  /// The goal presented and edited by this view controller.
+  ///
+  var goal: Goal?
 
   override func viewDidLoad() {
     super.viewDidLoad()
   }
 
-  override func viewDidAppear(_ animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
+    navigationItem.title    = goal?.title
+    titleLabel.text         = goal?.title
+    intervalLabel.text      = goal?.interval.description
+    frequency.text          = goal?.frequencyPerInterval
+    colour?.backgroundColor = goal?.colour
 //    let size = goalColour?.bounds.size ?? CGSize.zero,
 //    rect = CGRect(origin: CGPoint.zero, size: size),
 //    path = UIBezierPath(roundedRect: rect, cornerRadius: 8)
@@ -32,17 +41,9 @@ class DetailController: UIViewController {
 //    UIGraphicsEndImageContext()
   }
 
-  override func didReceiveMemoryWarning() { super.didReceiveMemoryWarning() }
-  
 
-  /*
-  // MARK: - Navigation
-
-  // In a storyboard-based application, you will often want to do a little preparation before navigation
-  override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
-      // Get the new view controller using segue.destinationViewController.
-      // Pass the selected object to the new view controller.
-  }
-  */
-
+//  // MARK: - Interacting with Storyboards and Segues
+//
+//  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//  }
 }
