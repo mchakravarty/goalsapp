@@ -68,3 +68,12 @@ class GoalsController: UITableViewController {
     }
   }
 }
+
+// MARK: Actions
+
+extension GoalsController {
+
+  @IBAction func addGoal(_ sender: AnyObject) {
+    edits.announce(change: .add(goal: Goal()))
+  }
+}

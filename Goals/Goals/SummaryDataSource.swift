@@ -15,13 +15,13 @@ class SummaryDataSource: NSObject {
 
   @IBOutlet private weak var collectionView: UICollectionView?
 
-  var goals: Goals = []     // Cache the last model data we observed.
+  var goals:       Goals = []     // Cache only the active goals from the last model data we observed.
 
   override init() {
     super.init()
 
     model.observe(withContext: self){ context, goals in
-      context.goals = goals
+      context.goals = goals.filter{ $0.goal.active }
       context.collectionView?.reloadData()
     }
   }

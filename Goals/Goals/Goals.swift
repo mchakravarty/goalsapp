@@ -49,7 +49,7 @@ struct Goal {
     self.active    = active
   }
 
-  init() { self = Goal(colour: .blue, title: "", interval: .daily, frequency: 1, active: false) }
+  init() { self = Goal(colour: .blue, title: "New Goal", interval: .daily, frequency: 1, active: false) }
 
   var frequencyPerInterval: String {
     // FIXME: use NumberFormatter to print frequency in words
@@ -84,16 +84,28 @@ typealias Goals = [GoalProgress]
 /// type `Goals`.
 ///
 enum GoalEdit {
+  case add(goal: Goal)
   case delete(goal: Goal)
   case update(goal: Goal)
 }
 
 extension GoalEdit {
-  func transform(_ goals: Goals) -> Goals {
+  func transform( _ goals: Goals) -> Goals {
+
     switch self {
-    case .delete(let goal):    return goals.filter{ !($0.goal === goal) }
-    case .update(let newGoal): return goals.map{ (goal: Goal, count: Int) in
-      return (goal === newGoal) ? (goal: newGoal, count: count) : (goal: goal, count: count) }
+    case .add(let newGoal):
+      guard !goals.contains(where: { $0.goal === newGoal} ) else { return goals }
+
+      var newGoals = goals
+      newGoals.insert((goal: newGoal, count: 0), at: 0)
+      return newGoals
+
+    case .delete(let goal):
+      return goals.filter{ !($0.goal === goal) }
+
+    case .update(let newGoal):
+      return goals.map{ (goal: Goal, count: Int) in
+        return (goal === newGoal) ? (goal: newGoal, count: count) : (goal: goal, count: count) }
     }
   }
 }
