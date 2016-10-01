@@ -22,7 +22,7 @@ class SummaryCell: UICollectionViewCell {
 
   func configure(goalProgress: GoalProgress) {
 
-    let percentageValue = goalProgress.goal.percentage(count: goalProgress.count)
+    let percentageValue = goalProgress.goal.percentage(count: goalProgress.progress ?? 0)
 
     name?.text            = goalProgress.goal.title
     percentage?.text      = percentageFormatter.string(from: NSNumber(value: percentageValue))

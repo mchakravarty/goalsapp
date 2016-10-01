@@ -38,18 +38,16 @@ struct Goal {
   var title:      String
   var interval:   GoalInterval
   var frequency:  Int             // how often the goal ought to be achieved during the interval
-  var active:     Bool            // is the goal being displayed in the overview
 
-  init(colour: UIColor, title: String, interval: GoalInterval, frequency: Int, active: Bool) {
+  init(colour: UIColor, title: String, interval: GoalInterval, frequency: Int) {
     self.uuid      = UUID()
     self.colour    = colour
     self.title     = title
     self.interval  = interval
     self.frequency = frequency
-    self.active    = active
   }
 
-  init() { self = Goal(colour: .blue, title: "New Goal", interval: .daily, frequency: 1, active: false) }
+  init() { self = Goal(colour: .blue, title: "New Goal", interval: .daily, frequency: 1) }
 
   var frequencyPerInterval: String {
     // FIXME: use NumberFormatter to print frequency in words
@@ -66,9 +64,9 @@ extension Goal {
   static func ===(lhs: Goal, rhs: Goal) -> Bool { return lhs.uuid == rhs.uuid }
 }
 
-/// A goal and the progress towards that goal in an interval.
+/// A goal and the progress towards that goal in an interval. Only active goals make progress.
 ///
-typealias GoalProgress = (goal: Goal, count: Int)
+typealias GoalProgress = (goal: Goal, progress: Int?)
 
 /// Specification of a collection of goals with progress — complete, immutable model state.
 ///
@@ -97,15 +95,15 @@ extension GoalEdit {
       guard !goals.contains(where: { $0.goal === newGoal} ) else { return goals }
 
       var newGoals = goals
-      newGoals.insert((goal: newGoal, count: 0), at: 0)
+      newGoals.insert((goal: newGoal, progress: nil), at: 0)
       return newGoals
 
     case .delete(let goal):
       return goals.filter{ !($0.goal === goal) }
 
     case .update(let newGoal):
-      return goals.map{ (goal: Goal, count: Int) in
-        return (goal === newGoal) ? (goal: newGoal, count: count) : (goal: goal, count: count) }
+      return goals.map{ (goal: Goal, count: Int?) in
+        return (goal === newGoal) ? (goal: newGoal, progress: count) : (goal: goal, progress: count) }
     }
   }
 }
@@ -128,13 +126,13 @@ typealias GoalEdits = Changing<GoalEdit>
 let edits = GoalEdits()
 
   // FIXME: needs to be read from persistent store
-let initialGoals = [ (goal:  Goal(colour: .blue, title: "Yoga", interval: .monthly, frequency: 5, active: true),
-                      count: 3)
-                   , (goal:  Goal(colour: .orange, title: "Walks", interval: .weekly, frequency: 3, active: true),
-                      count: 0)
-                   , (goal:  Goal(colour: .purple, title: "Stretching", interval: .daily, frequency: 3, active: true),
-                      count: 1)
-                   ]
+let initialGoals: Goals = [ (goal:  Goal(colour: .blue, title: "Yoga", interval: .monthly, frequency: 5),
+                             progress: 3)
+                          , (goal:  Goal(colour: .orange, title: "Walks", interval: .weekly, frequency: 3),
+                             progress: 0)
+                          , (goal:  Goal(colour: .purple, title: "Stretching", interval: .daily, frequency: 3),
+                             progress: 1)
+                          ]
 
 /// The current model value is determined by accumulating all edits.
 ///

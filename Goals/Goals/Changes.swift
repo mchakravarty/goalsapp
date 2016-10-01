@@ -6,7 +6,7 @@
 //  Copyright © 2016 Chakravarty & Keller. All rights reserved.
 //
 //  Simple event-based change propagation (FRP-style). This simplified API omits features, such as observing on specific
-//  GCD queues and temporary disabling of observers, to be easy to understand.
+//  GCD queues, to be easier to understand.
 //
 //  To be self-contained, we inline some general purpose definitions, such as `WeakBox` and `Either`.
 
@@ -19,32 +19,32 @@ import Foundation
 /// references that doesn't keep the referenced objects alive.)
 ///
 struct WeakBox<T: AnyObject> {     // aka Schrödinger's Box
-  private weak var box: T?
+  fileprivate weak var box: T?
   var unbox: T? { get { return box } }
   init(_ value: T) { self.box = value }
+}
 
-//  static func ===<T>(lhs: WeakBox<T>, rhs: WeakBox<T>) -> Bool {
-//    return lhs.box === rhs.box
-//  }
+func ===<T>(lhs: WeakBox<T>, rhs: WeakBox<T>) -> Bool {
+  return lhs.box === rhs.box
 }
 
 /// Delayed application of a function to a value, where the application is only computed if the weakly referenced
 /// value is still available when the result is demanded.
 ///
 struct WeakApply<T> {
-  private let arg: WeakBox<AnyObject>
-  private let fun: (AnyObject) -> T
+  fileprivate let arg: WeakBox<AnyObject>
+  fileprivate let fun: (AnyObject) -> T
   var unbox: T? { get { return arg.unbox.map(fun) } }
   init<S: AnyObject>(_ fun: @escaping (S) -> T, _ value: S) {
     self.arg = WeakBox(value)
     self.fun = { fun(($0 as? S)!) }
   }
+}
 
-//  /// Two weak applications are considered equivalent if they wrap the same argument (the function is not considered).
-//  ///
-//  static func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
-//    return lhs.arg === rhs.arg
-//  }
+/// Two weak applications are considered equivalent if they wrap the same argument (the function is not considered).
+///
+func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
+  return lhs.arg === rhs.arg
 }
 
 
@@ -60,7 +60,7 @@ enum Either<S, T> {
 // MARK: -
 // MARK: LeftRight
 
-class LeftRight {
+final class LeftRight {
   let left:  AnyObject
   let right: AnyObject
   init(left: AnyObject, right: AnyObject) { self.left = left; self.right = right }
@@ -70,6 +70,51 @@ class LeftRight {
 // MARK: -
 // MARK: Observables
 
+/// Observers are functions that receive an observed value together with a context in which the observation is being made.
+///
+typealias Observer<Context, ObservedValue> = (Context, ObservedValue) -> ()
+
+/// Observer that has been partially applied to its context.
+///
+typealias ContextualObserver<ObservedValue> = (ObservedValue) -> ()
+
+/// Opaque observation handle to be able to identify observations and to disable them.
+///
+final class Observation<ObservedValue> {
+  private let contextualObserver: WeakApply<ContextualObserver<ObservedValue>>
+  private var disabled:           Int = 0
+
+  /// Observations are observers that are applied to context objects tracked by weak references, the context object may
+  /// go at any time, which implicitly unregisters the corresponding observer.
+  ///
+  fileprivate init<Context: AnyObject>(observer: @escaping Observer<Context, ObservedValue>, context: Context) {
+    contextualObserver = WeakApply({ (context: Context) in { (change: ObservedValue) in observer(context, change) }},
+                         context)
+  }
+
+  /// Apply the observer to an observed value, unless the observer is disabled.
+  ///
+  /// The return value is `false` if the observer is no longer alive (i.e., its context object got deallocated).
+  ///
+  fileprivate func apply(_ value: ObservedValue) -> Bool {
+    if disabled >= 0 {
+
+      guard let observer = contextualObserver.unbox else { return false }
+      observer(value)
+    }
+    return true
+  }
+
+  /// Temporarily disable the given observation while performing the changes contained in the closure. Applications of
+  /// this function can be nested.
+  ///
+  func disable(in performChanges: () -> ()) {
+    disabled -= 1
+    performChanges()
+    disabled += 1
+  }
+}
+
 /// Abstract interface to an observable stream of changes over time.
 ///
 protocol Observable: class {
@@ -78,13 +123,6 @@ protocol Observable: class {
   ///
   associatedtype ObservedValue
 
-  /// Registered observers
-  ///
-  /// NB: Observers are associated with objects tracked by weak references. These objects may go at any time, which
-  ///     implicitly unregisters the corresponding observer.
-  ///
-//  typealias Observer<Context> = (Context, ObservedValue) -> ()
-
   /// Registers an observer together with a context object whose lifetime determines the duration of the observation.
   ///
   /// The context object is stored using a weak reference. (It cannot be fully parametric as only objects can have
@@ -92,14 +130,9 @@ protocol Observable: class {
   ///
   /// The observer will be called on the same thread where a new value is announced.
   ///
-  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping (Context, ObservedValue) -> ()) -> ()
-
-  /*
-  /// Temporarily disable the given observation while performing the changes contained in the closure. Applications of
-  /// this method can be nested.
-  ///
-  func disableObservation(observation: Observation<Value>, @noescape inChanges performChanges: () -> ())
- */
+  @discardableResult
+  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping Observer<Context, ObservedValue>)
+    -> Observation<ObservedValue>
 }
 
 
@@ -108,20 +141,9 @@ protocol Observable: class {
 class Changing<Value>: Observable {
   typealias ObservedValue = Value
 
-  typealias ContextualObserver = (Value) -> ()
-
   /// Registered observers
   ///
-  /// NB: Observers are bound to objects tracked by weak references, they may go at any time, which implicitly
-  ///     unregisters the corresponding observer.
-  ///
-  private var observers: [WeakApply<ContextualObserver>] = []
-
-  /*
-  /// Temporarily disabled observers.
-  ///
-  private var disabledObservers: [WeakApply<ContextualObserver>] = []
- */
+  private var observers: [Observation<ObservedValue>] = []
 
   /// In changes pipelines, we need to keep earlier stages of the pipeline alive.
   ///
@@ -134,16 +156,11 @@ class Changing<Value>: Observable {
 
   /// Announce a change to all observers.
   ///
-  func announce(change: Value)
-  {
-    for observer in observers {
-//      if (!disabledObservers.contains{ $0 === observer}) {
-        observer.unbox?(change)
-//      }
-    }
+  func announce(change: Value) {
 
-      // Prune stale observers.
-    observers = observers.filter{ $0.unbox != nil }
+      // Apply all observers to the change value and, at the same time, prune all stale observers (i.e., those whose
+      // context object got deallocated).
+    observers = observers.filter{ $0.apply(change) }
   }
 
   /// Registers an observer together with a context object whose lifetime determines the duration of the observation.
@@ -153,28 +170,13 @@ class Changing<Value>: Observable {
   ///
   /// The observer will be called on the same thread as the change announcement.
   ///
-  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping (Context, ObservedValue) -> ()) -> ()
-//    -> Observation<Value>
+  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping Observer<Context, ObservedValue>)
+    -> Observation<Value>
   {
-    let appliedObserver = WeakApply({ (context: Context) in { (change: ObservedValue) in observer(context, change) }},
-                                    context)
-    observers.append(appliedObserver)
-//    return Observation(observer: appliedObserver)
+    let observation = Observation(observer: observer, context: context)
+    observers.append(observation)
+    return observation
   }
-
-  /*
-  /// Temporarily disable the given observation while performing the changes contained in the closure. Applications of
-  /// this method can be nested.
-  ///
-  public func disableObservation(observation: Observation<Value>, @noescape inChanges performChanges: () -> ()) {
-    let originalDisabledObservers = disabledObservers
-    disabledObservers.append(observation.observer)
-
-    performChanges()
-
-    disabledObservers = originalDisabledObservers
-  }
- */
 }
 
 /// Trigger streams are changes that only convey a point in time.
@@ -189,7 +191,7 @@ class Accumulating<Value, Accumulator>: Observable {
 
   private let retainedObserved: AnyObject                // This is to keep the observed object alive.
   private var accumulator:      Accumulator              // Encapsulated accumulator value
-  private var changes:          Changing<Accumulator>?   // Stream of accumulator changes
+  private var changes:          Changing<Accumulator>   // Stream of accumulator changes
 
   /// Constructs an accumulator with the given initial value, which is fed by an observed object by applying an
   /// accumulation function to the current accumulator value and the observed change to determine the new accumulator
@@ -206,7 +208,7 @@ class Accumulating<Value, Accumulator>: Observable {
 
     observed.observe(withContext: self){ (context: Accumulating<Value, ObservedValue>, value: Value) in
       context.accumulator = accumulate(value, context.accumulator)
-      context.changes?.announce(change: context.accumulator)
+      context.changes.announce(change: context.accumulator)
     }
   }
 
@@ -218,10 +220,12 @@ class Accumulating<Value, Accumulator>: Observable {
   ///
   /// The observer will be called on the same thread as the change announcement.
   ///
-  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping (Context, ObservedValue) -> ()) -> ()
+  func observe<Context: AnyObject>(withContext context: Context, observer: @escaping Observer<Context, ObservedValue>)
+    -> Observation<ObservedValue>
   {
-    changes?.observe(withContext: context, observer: observer)
+    let observation = changes.observe(withContext: context, observer: observer)
     observer(context, accumulator)
+    return observation
   }
 }
 

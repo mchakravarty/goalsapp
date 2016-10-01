@@ -16,22 +16,25 @@ class GoalsDataSource: NSObject {
 
   @IBOutlet private weak var tableView: UITableView?
 
-  fileprivate var goals: Goals = []     // Cache the last model data we observed.
+  fileprivate var goals:            Goals = []          // Cache the last model data we observed.
+  fileprivate var goalsObservation: Observation<Goals>!
 
   override init() {
     super.init()
 
-    model.observe(withContext: self){ context, goals in
+    goalsObservation = model.observe(withContext: self){ context, goals in
       context.goals = goals
       context.tableView?.reloadData()
     }
-  }
+}
 
   /// Retrieve the goal at the given index path in the model data, if available.
   ///
-  func goal(at indexPath: IndexPath) -> Goal? {
+  func goal(at indexPath: IndexPath) -> (goal: Goal, isActive: Bool)? {
     let idx = indexPath.item
-    if idx >= goals.startIndex && idx < goals.endIndex { return goals[idx].goal } else { return nil }
+    if idx >= goals.startIndex && idx < goals.endIndex {
+      return (goal: goals[idx].goal, isActive: goals[idx].progress != nil)
+    } else { return nil }
   }
 }
 
@@ -41,18 +44,19 @@ extension GoalsDataSource: UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: kGoalTableCell) ?? UITableViewCell(),
-        goal = self.goal(at: indexPath) ?? Goal ()
+        goal = self.goal(at: indexPath) ?? (goal: Goal(), isActive: false)
 
     let rect = CGRect(origin: CGPoint.zero, size: size),
         path = UIBezierPath(roundedRect: rect, cornerRadius: 8)
     UIGraphicsBeginImageContext(size)
-    goal.colour.setFill()
+    goal.goal.colour.setFill()
     path.fill()
     cell.imageView?.image = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
 
-    cell.textLabel?.text       = goal.title
-    cell.detailTextLabel?.text = goal.frequencyPerInterval
+    cell.textLabel?.text       = goal.goal.title
+    cell.detailTextLabel?.text = goal.goal.frequencyPerInterval
+    cell.editingAccessoryType  = goal.isActive ? .checkmark : .none
     return cell
   }
 
@@ -62,7 +66,13 @@ extension GoalsDataSource: UITableViewDataSource {
   {
     guard let goal = self.goal(at: indexPath) else { return }
 
-    edits.announce(change: .delete(goal: goal))
+      // Remove goal from model without updating our local cache.
+    goalsObservation.disable{
+      edits.announce(change: .delete(goal: goal.goal))
+    }
+
+      // Independently remove it from our local model cache and the UI to properly animate.
+    goals.remove(at: indexPath.item)
     tableView.deleteRows(at: [indexPath], with: .left)
   }
 }

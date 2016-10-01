@@ -15,13 +15,13 @@ class SummaryDataSource: NSObject {
 
   @IBOutlet private weak var collectionView: UICollectionView?
 
-  var goals:       Goals = []     // Cache only the active goals from the last model data we observed.
+  var goals: Goals = []     // Cache only the active goals from the last model data we observed.
 
   override init() {
     super.init()
 
     model.observe(withContext: self){ context, goals in
-      context.goals = goals.filter{ $0.goal.active }
+      context.goals = goals.filter{ $0.progress != nil }
       context.collectionView?.reloadData()
     }
   }
@@ -41,7 +41,7 @@ extension SummaryDataSource: UICollectionViewDataSource {
     let idx = indexPath[1],
         goalProgress: GoalProgress
     if idx >= goals.startIndex && idx < goals.endIndex { goalProgress = goals[idx] }
-    else { goalProgress = (goal: Goal(), count: 0) }
+    else { goalProgress = (goal: Goal(), progress: nil) }
 
     cell.configure(goalProgress: goalProgress)
     return cell
