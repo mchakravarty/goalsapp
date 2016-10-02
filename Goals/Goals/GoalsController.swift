@@ -33,6 +33,16 @@ class GoalsController: UITableViewController {
     navigationItem.rightBarButtonItem = editButtonItem
   }
 
+  // This is awkward — see caller.
+  func deleteItem(at idx: Int) {
+    switch editState {
+    case .displaying: ()
+    case .editing(var goalsActivity):
+      goalsActivity.remove(at: idx)
+      editState = .editing(goalsActivity: goalsActivity)
+    }
+  }
+
   // MARK: - Managing editing
 
   override func setEditing(_ editing: Bool, animated: Bool) {

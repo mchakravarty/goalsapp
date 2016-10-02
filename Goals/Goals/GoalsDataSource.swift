@@ -97,5 +97,10 @@ extension GoalsDataSource: UITableViewDataSource {
       // Independently remove it from our local model cache and the UI to properly animate.
     goals.remove(at: indexPath.item)
     tableView.deleteRows(at: [indexPath], with: .left)
+
+      // FIXME: This is awkward!!!
+    if let controller = tableView.delegate as? GoalsController {
+      controller.deleteItem(at: indexPath.item)
+    }
   }
 }
