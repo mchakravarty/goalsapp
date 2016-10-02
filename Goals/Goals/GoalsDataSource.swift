@@ -37,6 +37,20 @@ class GoalsDataSource: NSObject {
     } else { return nil }
   }
 
+  /// Add the given goal at the top of the table view.
+  ///
+  func add(goal: Goal) {
+
+      // Add goal to the model without updating our local cache.
+    goalsObservation.disable{
+      goalEdits.announce(change: .add(goal: goal))
+    }
+
+      // Independently add it to our local model cache and the UI to properly animate.
+    goals.insert((goal: goal, progress: nil), at: 0)
+    tableView?.insertRows(at: [IndexPath(item: 0, section: 0)], with: .left)
+  }
+
   /// Flag array indicating for each goal whether it is active.
   ///
   var goalsActivity: [Bool] { return goals.map{ $0.progress != nil } }
@@ -72,7 +86,8 @@ extension GoalsDataSource: UITableViewDataSource {
                  commit editingStyle: UITableViewCellEditingStyle,
                  forRowAt indexPath: IndexPath)
   {
-    guard let goal = self.goal(at: indexPath) else { return }
+    guard editingStyle == .delete,
+      let goal = self.goal(at: indexPath) else { return }
 
       // Remove goal from model without updating our local cache.
     goalsObservation.disable{

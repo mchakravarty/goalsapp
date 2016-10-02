@@ -73,13 +73,13 @@ class GoalsController: UITableViewController {
     editState = .editing(goalsActivity: goalsActivity)
   }
 
-
   /*
   // Override to support rearranging the table view.
   override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
 
   }
   */
+
 
   // MARK: - Interacting with Storyboards and Segues
 
@@ -99,13 +99,16 @@ class GoalsController: UITableViewController {
   }
 }
 
-// MARK: Actions
+
+// MARK: - Actions
 
 extension GoalsController {
 
   @IBAction func addGoal(_ sender: AnyObject) {
+    guard let goalsDataSource = tableView.dataSource as? GoalsDataSource else { return }
+
     if isEditing { return }     // Adding a goal in editing state can lead to inconsistency
 
-    goalEdits.announce(change: .add(goal: Goal()))
+    goalsDataSource.add(goal: Goal())
   }
 }
