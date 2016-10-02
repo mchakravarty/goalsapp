@@ -26,7 +26,7 @@ class GoalsDataSource: NSObject {
       context.goals = goals
       context.tableView?.reloadData()
     }
-}
+  }
 
   /// Retrieve the goal at the given index path in the model data, if available.
   ///
@@ -35,6 +35,14 @@ class GoalsDataSource: NSObject {
     if idx >= goals.startIndex && idx < goals.endIndex {
       return (goal: goals[idx].goal, isActive: goals[idx].progress != nil)
     } else { return nil }
+  }
+
+  /// Flag array indicating for each goal whether it is active.
+  ///
+  var goalsActivity: [Bool] { return goals.map{ $0.progress != nil } }
+
+  func commitGoalsActivity(_ goalsActivity: [Bool]) {
+    edits.announce(change: .setActivity(activity: goalsActivity))
   }
 }
 

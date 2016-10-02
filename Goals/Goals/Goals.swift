@@ -47,7 +47,7 @@ struct Goal {
     self.frequency = frequency
   }
 
-  init() { self = Goal(colour: .blue, title: "New Goal", interval: .daily, frequency: 1) }
+  init() { self = Goal(colour: .green, title: "New Goal", interval: .daily, frequency: 1) }
 
   var frequencyPerInterval: String {
     // FIXME: use NumberFormatter to print frequency in words
@@ -74,6 +74,21 @@ typealias GoalProgress = (goal: Goal, progress: Int?)
 ///
 typealias Goals = [GoalProgress]
 
+/// Adjust the progress component of goals with progress according to the activity array.
+///
+/// Precondition: the activities array has at least as many entries as the goals array
+///
+func mergeActivity(goals: Goals, activity: [Bool]) -> Goals {
+  return zip(goals, activity).map{ goal, isActive in
+    switch (goal.progress, isActive) {
+    case (nil, false),
+         (.some, true):  return goal
+    case (nil, true):    return (goal: goal.goal, progress: 0)
+    case (.some, false): return (goal: goal.goal, progress: nil)
+    }
+  }
+}
+
 
 // MARK: -
 // MARK: Model edits
@@ -85,6 +100,7 @@ enum GoalEdit {
   case add(goal: Goal)
   case delete(goal: Goal)
   case update(goal: Goal)
+  case setActivity(activity: [Bool])
 }
 
 extension GoalEdit {
@@ -104,6 +120,9 @@ extension GoalEdit {
     case .update(let newGoal):
       return goals.map{ (goal: Goal, count: Int?) in
         return (goal === newGoal) ? (goal: newGoal, progress: count) : (goal: goal, progress: count) }
+
+    case .setActivity(let goalsActivity):
+      return mergeActivity(goals: goals, activity: goalsActivity)
     }
   }
 }
