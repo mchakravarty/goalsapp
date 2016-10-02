@@ -106,6 +106,6 @@ extension GoalsController {
   @IBAction func addGoal(_ sender: AnyObject) {
     if isEditing { return }     // Adding a goal in editing state can lead to inconsistency
 
-    edits.announce(change: .add(goal: Goal()))
+    goalEdits.announce(change: .add(goal: Goal()))
   }
 }

@@ -66,6 +66,7 @@ extension Goal {
 
 /// A goal and the progress towards that goal in an interval. Only active goals make progress.
 ///
+/// FIXME: Would probably be nicer to use a dictionary instead of an array of pairs.
 typealias GoalProgress = (goal: Goal, progress: Int?)
 
 /// Specification of a collection of goals with progress — complete, immutable model state.
@@ -91,10 +92,10 @@ func mergeActivity(goals: Goals, activity: [Bool]) -> Goals {
 
 
 // MARK: -
-// MARK: Model edits
+// MARK: Goals edits
 
-/// This type encompases all transformations that may be applied to everything but the progress counts in values of
-/// type `Goals`.
+/// This type encompases all transformations that may be applied to goals except advancing the progress counts in values
+/// of type `Goals`.
 ///
 enum GoalEdit {
   case add(goal: Goal)
@@ -104,7 +105,8 @@ enum GoalEdit {
 }
 
 extension GoalEdit {
-  func transform( _ goals: Goals) -> Goals {
+
+  func transform(_ goals: Goals) -> Goals {
 
     switch self {
     case .add(let newGoal):
@@ -127,6 +129,67 @@ extension GoalEdit {
   }
 }
 
+/// Type of a stream of goal edits.
+///
+typealias GoalEdits = Changing<GoalEdit>
+
+
+// MARK: -
+// MARK: Progress edits
+
+/// This type captures the transformations that advance goal progress.
+///
+enum ProgressEdit {
+  case bump(goal: Goal)
+}
+
+extension ProgressEdit {
+
+  func transform(_ goals: Goals) -> Goals {
+
+    switch self {
+    case .bump(let bumpedGoal):
+      return goals.map{ (goal: Goal, count: Int?) in
+        return (goal === bumpedGoal) ? (goal: goal, progress: count.flatMap{ $0 + 1 }) : (goal: goal, progress: count) }
+    }
+  }
+}
+
+/// Type of a stream of progress edits.
+///
+typealias ProgressEdits = Changing<ProgressEdit>
+
+
+// MARK: -
+// MARK: All model edits
+
+/// Merged edits
+///
+enum Edit {
+  case goalEdit(edit: GoalEdit)
+  case progressEdit(edit: ProgressEdit)
+}
+
+extension Edit {
+
+  init(goalOrProgressEdit: Either<GoalEdit, ProgressEdit>) {
+    switch goalOrProgressEdit {
+    case .left(let goalEdit):      self = .goalEdit(edit: goalEdit)
+    case .right(let progressEdit): self = .progressEdit(edit: progressEdit)
+    }
+  }
+
+  func transform(_ goals: Goals) -> Goals {
+
+    switch self {
+    case .goalEdit(let goalEdit):         return goalEdit.transform(goals)
+    case .progressEdit(let progressEdit): return progressEdit.transform(goals)
+    }
+  }
+}
+
+typealias Edits = Changing<Edit>
+
 
 // MARK: -
 // MARK: Model store
@@ -136,13 +199,12 @@ extension GoalEdit {
 //     subsystems of the app by passing the observables into only those data sources, views, or controllers that need
 //     the corresponding access.
 
-/// Type of a stream of goal edits.
-///
-typealias GoalEdits = Changing<GoalEdit>
 
-/// Collects all goal edits in this app.
-///
-let edits = GoalEdits()
+// Streams of edits.
+
+let goalEdits     = GoalEdits(),
+    progressEdits = ProgressEdits(),
+    edits: Edits  = goalEdits.merge(right: progressEdits).map{ Edit(goalOrProgressEdit: $0) }
 
   // FIXME: needs to be read from persistent store
 let initialGoals: Goals = [ (goal:  Goal(colour: .blue, title: "Yoga", interval: .monthly, frequency: 5),
@@ -155,6 +217,6 @@ let initialGoals: Goals = [ (goal:  Goal(colour: .blue, title: "Yoga", interval:
 
 /// The current model value is determined by accumulating all edits.
 ///
-let model: Accumulating<GoalEdit, Goals> = edits.accumulate(startingFrom: initialGoals){ edit, currentGoals in
+let model: Accumulating<Edit, Goals> = edits.accumulate(startingFrom: initialGoals){ edit, currentGoals in
   return edit.transform(currentGoals)
 }

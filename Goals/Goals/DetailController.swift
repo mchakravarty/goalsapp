@@ -56,6 +56,6 @@ extension DetailController {
     titleTextField.isHidden = true
     titleLabel.isHidden     = false
 
-    if let goal = goal { edits.announce(change: .update(goal: goal)) }
+    if let goal = goal { goalEdits.announce(change: .update(goal: goal)) }
   }
 }

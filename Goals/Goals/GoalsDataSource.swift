@@ -42,7 +42,7 @@ class GoalsDataSource: NSObject {
   var goalsActivity: [Bool] { return goals.map{ $0.progress != nil } }
 
   func commitGoalsActivity(_ goalsActivity: [Bool]) {
-    edits.announce(change: .setActivity(activity: goalsActivity))
+    goalEdits.announce(change: .setActivity(activity: goalsActivity))
   }
 }
 
@@ -76,7 +76,7 @@ extension GoalsDataSource: UITableViewDataSource {
 
       // Remove goal from model without updating our local cache.
     goalsObservation.disable{
-      edits.announce(change: .delete(goal: goal.goal))
+      goalEdits.announce(change: .delete(goal: goal.goal))
     }
 
       // Independently remove it from our local model cache and the UI to properly animate.

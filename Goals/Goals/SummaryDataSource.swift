@@ -25,6 +25,12 @@ class SummaryDataSource: NSObject {
       context.collectionView?.reloadData()
     }
   }
+
+  func bumpProgress(of idx: Int) {
+    guard idx < goals.count else { return }
+
+    progressEdits.announce(change: .bump(goal: goals[idx].goal))
+  }
 }
 
 extension SummaryDataSource: UICollectionViewDataSource {

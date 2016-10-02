@@ -5,8 +5,9 @@
 //  Created by Manuel M T Chakravarty on 28/06/2016.
 //  Copyright © 2016 Chakravarty & Keller. All rights reserved.
 //
-//  Simple event-based change propagation (FRP-style). This simplified API omits features, such as observing on specific
-//  GCD queues, to be easier to understand.
+//  Simple event-based change propagation (FRP-style). This simplified API omits some features to be easier to
+//  understand. In particular, there is no support for observing on specific GCD queues and there is no distinction
+//  between the reading and writing end of a stream of changes.
 //
 //  To be self-contained, we inline some general purpose definitions, such as `WeakBox` and `Either`.
 
@@ -52,8 +53,8 @@ func ===<T>(lhs: WeakApply<T>, rhs: WeakApply<T>) -> Bool {
 // MARK: Either
 
 enum Either<S, T> {
-  case Left(S)
-  case Right(T)
+  case left(S)
+  case right(T)
 }
 
 
@@ -170,6 +171,7 @@ class Changing<Value>: Observable {
   ///
   /// The observer will be called on the same thread as the change announcement.
   ///
+  @discardableResult
   func observe<Context: AnyObject>(withContext context: Context, observer: @escaping Observer<Context, ObservedValue>)
     -> Observation<Value>
   {
@@ -220,6 +222,7 @@ class Accumulating<Value, Accumulator>: Observable {
   ///
   /// The observer will be called on the same thread as the change announcement.
   ///
+  @discardableResult
   func observe<Context: AnyObject>(withContext context: Context, observer: @escaping Observer<Context, ObservedValue>)
     -> Observation<ObservedValue>
   {
@@ -286,11 +289,11 @@ extension Observable {
     let changes = Changing<Change>(retainObservedObject: LeftRight(left: self, right: right))
     self.observe(withContext: changes,
                  observer: { changesContext, change in
-                  let leftChange: Change = .Left(change)
+                  let leftChange: Change = .left(change)
                   changesContext.announce(change: leftChange) })
     right.observe(withContext: changes,
                   observer: { changesContext, change in
-                    let rightChange: Change = .Right(change)
+                    let rightChange: Change = .right(change)
                     changesContext.announce(change: rightChange) })
     return changes
   }
