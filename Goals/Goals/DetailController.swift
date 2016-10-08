@@ -62,5 +62,4 @@ class DetailController: UIViewController {
 
     if let goal = goal { goalEdits.announce(change: .update(goal: goal)) }
   }
-
 }
