@@ -31,11 +31,8 @@ class DetailController: UIViewController {
 
     titleTextField.isHidden = true
   }
-}
 
 // TODO: Add support to edit the other properties of a goal.
-
-extension DetailController {
 
   @IBAction func tappedTitle(_ sender: AnyObject) {
     titleTextField.text     = goal?.title
