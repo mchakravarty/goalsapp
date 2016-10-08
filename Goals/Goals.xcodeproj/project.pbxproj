@@ -77,7 +77,9 @@
 				E7DE0CD91D1A73BC0053A00B /* GoalsTests */,
 				E7DE0CC11D1A73BC0053A00B /* Products */,
 			);
+			indentWidth = 2;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		E7DE0CC11D1A73BC0053A00B /* Products */ = {
 			isa = PBXGroup;
