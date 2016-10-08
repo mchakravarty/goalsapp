@@ -46,13 +46,17 @@ extension DetailController {
   }
 
   @IBAction func titleFinishedEditing(_ sender: AnyObject) {
+    titleTextField.isHidden = true
+    titleLabel.isHidden     = false
+  }
+
+  @IBAction func titleChanged(_ sender: AnyObject) {
     let newTitle = titleTextField.text ?? ""
     goal?.title             = newTitle
     navigationItem.title    = newTitle
     titleLabel.text         = newTitle
-    titleTextField.isHidden = true
-    titleLabel.isHidden     = false
 
     if let goal = goal { goalEdits.announce(change: .update(goal: goal)) }
   }
+
 }
