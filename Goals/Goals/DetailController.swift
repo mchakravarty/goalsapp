@@ -23,9 +23,6 @@ class DetailController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-  }
-
-  override func viewWillAppear(_ animated: Bool) {
     navigationItem.title    = goal?.title
     titleLabel.text         = goal?.title
     intervalLabel.text      = goal?.interval.description
