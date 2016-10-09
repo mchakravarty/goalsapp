@@ -19,26 +19,29 @@ class DetailController: UIViewController {
 
   /// The goal presented and edited by this view controller.
   ///
-  var goal: Goal?
+  var goal: Goal? {
+    didSet {
+      updateGoalUI()
+    }
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-  }
-
-  override func viewWillAppear(_ animated: Bool) {
-    navigationItem.title    = goal?.title
-    titleLabel.text         = goal?.title
-    intervalLabel.text      = goal?.interval.description
-    frequency.text          = goal?.frequencyPerInterval
-    colour?.backgroundColor = goal?.colour
-
+    updateGoalUI()
     titleTextField.isHidden = true
   }
-}
+
+  private func updateGoalUI() {
+    if isViewLoaded {
+      navigationItem.title    = goal?.title
+      titleLabel.text         = goal?.title
+      intervalLabel.text      = goal?.interval.description
+      frequency.text          = goal?.frequencyPerInterval
+      colour?.backgroundColor = goal?.colour
+    }
+  }
 
 // TODO: Add support to edit the other properties of a goal.
-
-extension DetailController {
 
   @IBAction func tappedTitle(_ sender: AnyObject) {
     titleTextField.text     = goal?.title
@@ -49,12 +52,13 @@ extension DetailController {
   }
 
   @IBAction func titleFinishedEditing(_ sender: AnyObject) {
-    let newTitle = titleTextField.text ?? ""
-    goal?.title             = newTitle
-    navigationItem.title    = newTitle
-    titleLabel.text         = newTitle
     titleTextField.isHidden = true
     titleLabel.isHidden     = false
+  }
+
+  @IBAction func titleChanged(_ sender: AnyObject) {
+    let newTitle = titleTextField.text ?? ""
+    goal?.title  = newTitle
 
     if let goal = goal { goalEdits.announce(change: .update(goal: goal)) }
   }
