@@ -6,6 +6,10 @@ A simple iPhone app to track recurring periodic goals as an example for the appl
 2. The use of enums with associated types to keep track of UI modes (UI state machine).
 3. The use of FRP-ish change streams to propagate updates in a structured manner.
 
+## Talk
+
+This app served as a running example in my talk [A Type is Worth a Thousand Tests](https://speakerdeck.com/mchakravarty/a-type-is-worth-a-thousand-tests).
+
 ## Scope
 
 The app is quite minimal on purpose. However, the following is a list of improvments that will make it into a more comprehensive example:
