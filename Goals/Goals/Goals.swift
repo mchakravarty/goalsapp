@@ -3,7 +3,7 @@
 //  Goals
 //
 //  Created by Manuel M T Chakravarty on 22/06/2016.
-//  Copyright © 2016 Chakravarty & Keller. All rights reserved.
+//  Copyright © [2016..2017] Chakravarty & Keller. All rights reserved.
 //
 //  Model representation
 
@@ -26,6 +26,24 @@ enum GoalInterval: CustomStringConvertible {
     case .weekly:  return "Weekly"
     case .monthly: return "Monthly"
     }
+  }
+
+  /// Printed frequency for the current time interval, assumming the argument is greater than zero.
+  ///
+  func frequency(number: Int) -> String {
+    var result: String
+
+    switch number {
+    case 1:  result = "once"
+    case 2:  result = "twice"
+    default: result = "\(number) times"
+    }
+    switch self {
+    case .daily:   result += " per day"
+    case .weekly:  result += " per week"
+    case .monthly: result += " per month"
+    }
+    return result
   }
 }
 
@@ -66,12 +84,14 @@ extension Goal {
 
 /// A goal and the progress towards that goal in an interval. Only active goals make progress.
 ///
-/// FIXME: Would probably be nicer to use a dictionary instead of an array of pairs.
 typealias GoalProgress = (goal: Goal, progress: Int?)
 
 /// Specification of a collection of goals with progress — complete, immutable model state.
 ///
 /// * The order of the goals in the array determines their order on the overview screen.
+///
+/// NB: If the number of entries in this array was bigger, it would be more efficient to use a dictionary indexed by
+///     goals (or rather their UUID), but as it is, an array suffices and also matches the ordering of the goals in UI.
 ///
 typealias Goals = [GoalProgress]
 
@@ -131,7 +151,7 @@ extension GoalEdit {
 
 /// Type of a stream of goal edits.
 ///
-typealias GoalEdits = Changing<GoalEdit>
+typealias GoalEdits = Changes<GoalEdit>
 
 
 // MARK: -
@@ -157,7 +177,7 @@ extension ProgressEdit {
 
 /// Type of a stream of progress edits.
 ///
-typealias ProgressEdits = Changing<ProgressEdit>
+typealias ProgressEdits = Changes<ProgressEdit>
 
 
 // MARK: -
@@ -188,7 +208,7 @@ extension Edit {
   }
 }
 
-typealias Edits = Changing<Edit>
+typealias Edits = Changes<Edit>
 
 
 // MARK: -
@@ -217,6 +237,6 @@ let initialGoals: Goals = [ (goal:  Goal(colour: .blue, title: "Yoga", interval:
 
 /// The current model value is determined by accumulating all edits.
 ///
-let model: Accumulating<Edit, Goals> = edits.accumulate(startingFrom: initialGoals){ edit, currentGoals in
+let model: Changing<Goals> = edits.accumulate(startingFrom: initialGoals){ edit, currentGoals in
   return edit.transform(currentGoals)
 }

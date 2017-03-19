@@ -3,7 +3,7 @@
 //  Goals
 //
 //  Created by Manuel M T Chakravarty on 28/06/2016.
-//  Copyright © 2016 Chakravarty & Keller. All rights reserved.
+//  Copyright © [2016..2017] Chakravarty & Keller. All rights reserved.
 //
 //  Simple event-based change propagation (FRP-style). This simplified API omits some features to be easier to
 //  understand. In particular, there is no support for observing on specific GCD queues and there is no distinction
@@ -136,11 +136,24 @@ protocol Observable: class {
     -> Observation<ObservedValue>
 }
 
-
-/// A changing value is represented by a stream of changes of which registered observers are being notified.
+/// Abstract interface to issuing announcements for a stream of changes over time.
 ///
-class Changing<Value>: Observable {
-  typealias ObservedValue = Value
+protocol Announcable: class {
+
+  /// The type of anounced values.
+  ///
+  associatedtype AnnouncedValue
+
+  /// Announce a change to all observers.
+  ///
+  func announce(change: AnnouncedValue)
+}
+
+/// Stream of ephemeral changes of which registered observers are being notified.
+///
+class Changes<Value>: Announcable, Observable {
+  typealias AnnouncedValue = Value
+  typealias ObservedValue  = Value
 
   /// Registered observers
   ///
@@ -183,17 +196,17 @@ class Changing<Value>: Observable {
 
 /// Trigger streams are changes that only convey a point in time.
 ///
-typealias Triggers = Changing<()>
+typealias Triggers = Changes<()>
 
 /// An accumulating value combines a stream of changes into an evolving value that may be observed by registered
 /// observers.
 ///
-class Accumulating<Value, Accumulator>: Observable {
-  typealias ObservedValue = Accumulator
+class Changing<Value>: Observable {
+  typealias ObservedValue = Value
 
-  private let retainedObserved: AnyObject                // This is to keep the observed object alive.
-  private var accumulator:      Accumulator              // Encapsulated accumulator value
-  private var changes:          Changing<Accumulator>   // Stream of accumulator changes
+  private let retainedObserved: AnyObject         // This is to keep the observed object alive.
+  fileprivate var accumulator:      Value             // Encapsulated accumulator value
+  private var changes:          Changes<Value>    // Stream of accumulator changes
 
   /// Constructs an accumulator with the given initial value, which is fed by an observed object by applying an
   /// accumulation function to the current accumulator value and the observed change to determine the new accumulator
@@ -201,14 +214,14 @@ class Accumulating<Value, Accumulator>: Observable {
   ///
   init<Observed: Observable>
     (observing observed: Observed,
-     startingFrom initial: Accumulator,
-     accumulateWith accumulate: @escaping (Value, Accumulator) -> Accumulator) where Value == Observed.ObservedValue
+     startingFrom initial: Value,
+     accumulateWith accumulate: @escaping (Observed.ObservedValue, Value) -> Value)
   {
     retainedObserved = observed
     accumulator      = initial
-    changes          = Changing<Accumulator>()
+    changes          = Changes<Value>()
 
-    observed.observe(withContext: self){ (context: Accumulating<Value, ObservedValue>, value: Value) in
+    observed.observe(withContext: self){ (context: Changing<ObservedValue>, value: Observed.ObservedValue) in
       context.accumulator = accumulate(value, context.accumulator)
       context.changes.announce(change: context.accumulator)
     }
@@ -244,9 +257,9 @@ extension Observable {
   /// mean that it hasn't got any observers anymore, but that no other object keeps a strong reference to the stream
   /// of changes itself.)
   ///
-  func map<MappedValue>(transform: @escaping (ObservedValue) -> MappedValue) -> Changing<MappedValue> {
+  func map<MappedValue>(transform: @escaping (ObservedValue) -> MappedValue) -> Changes<MappedValue> {
 
-    let changes = Changing<MappedValue>(retainObservedObject: self)
+    let changes = Changes<MappedValue>(retainObservedObject: self)
     observe(withContext: changes,
             observer: { changesContext, change in changesContext.announce(change: transform(change)) })
     return changes
@@ -258,9 +271,9 @@ extension Observable {
   /// mean that it hasn't got any observers anymore, but that no other object keeps a strong reference to the stream
   /// of triggers itself.)
   ///
-  func filter(predicate: @escaping (ObservedValue) -> Bool) -> Changing<ObservedValue> {
+  func filter(predicate: @escaping (ObservedValue) -> Bool) -> Changes<ObservedValue> {
 
-    let changes = Changing<ObservedValue>(retainObservedObject: self)
+    let changes = Changes<ObservedValue>(retainObservedObject: self)
     self.observe(withContext: changes,
                  observer: { changesContext, change in
                               if predicate(change) { changesContext.announce(change: change) } })
@@ -269,9 +282,9 @@ extension Observable {
 
   func accumulate<Accumulator>(startingFrom initial: Accumulator,
                                accumulateWith accumulate: @escaping (ObservedValue, Accumulator) -> Accumulator)
-    -> Accumulating<ObservedValue, Accumulator>
+    -> Changing<Accumulator>
   {
-    return Accumulating<ObservedValue, Accumulator>(observing: self, startingFrom: initial, accumulateWith: accumulate)
+    return Changing<Accumulator>(observing: self, startingFrom: initial, accumulateWith: accumulate)
   }
 
   /// Merge two observation streams into one.
@@ -281,12 +294,12 @@ extension Observable {
   /// of changes itself.)
   ///
   func merge<ObservedRight: Observable>(right: ObservedRight)
-    -> Changing<Either<ObservedValue, ObservedRight.ObservedValue>>
+    -> Changes<Either<ObservedValue, ObservedRight.ObservedValue>>
   {
 
     typealias Change = Either<ObservedValue, ObservedRight.ObservedValue>
 
-    let changes = Changing<Change>(retainObservedObject: LeftRight(left: self, right: right))
+    let changes = Changes<Change>(retainObservedObject: LeftRight(left: self, right: right))
     self.observe(withContext: changes,
                  observer: { changesContext, change in
                   let leftChange: Change = .left(change)
@@ -296,5 +309,38 @@ extension Observable {
                     let rightChange: Change = .right(change)
                     changesContext.announce(change: rightChange) })
     return changes
+  }
+}
+
+
+// MARK: -
+// MARK: Combinators for streams of changing values
+
+extension Changing {
+
+  /// Transform a changing value with the given transformation function.
+  ///
+  func map<MappedValue>(transform: @escaping (Value) -> MappedValue) -> Changing<MappedValue> {
+    return Changing<MappedValue>(observing: self, startingFrom: transform(accumulator)){ (change, _) in
+      return transform(change)
+    }
+  }
+}
+
+
+// MARK: -
+// MARK: Lifting functions from plain values to changing values.
+
+func lift2<Value1, Value2, Value3>(_ changing1: Changing<Value1>, _ changing2: Changing<Value2>,
+           combineValues: @escaping (Value1, Value2) -> Value3)
+  -> Changing<Value3>
+{
+  let initial    = combineValues(changing1.accumulator, changing2.accumulator),
+      changing12 = changing1.merge(right: changing2)
+  return Changing(observing: changing12, startingFrom: initial){ (change, _) in
+    switch change {
+    case .left(let value1):  return combineValues(value1, changing2.accumulator)
+    case .right(let value2): return combineValues(changing1.accumulator, value2)
+    }
   }
 }
