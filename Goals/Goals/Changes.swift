@@ -62,9 +62,9 @@ enum Either<S, T> {
 // MARK: LeftRight
 
 final class LeftRight {
-  let left:  AnyObject
-  let right: AnyObject
-  init(left: AnyObject, right: AnyObject) { self.left = left; self.right = right }
+  let left:  Any
+  let right: Any
+  init(left: Any, right: Any) { self.left = left; self.right = right }
 }
 
 
@@ -118,7 +118,7 @@ final class Observation<ObservedValue> {
 
 /// Abstract interface to an observable stream of changes over time.
 ///
-protocol Observable: class {
+protocol Observable {
 
   /// The type of observed values.
   ///
@@ -138,7 +138,7 @@ protocol Observable: class {
 
 /// Abstract interface to issuing announcements for a stream of changes over time.
 ///
-protocol Announcable: class {
+protocol Announcable {
 
   /// The type of anounced values.
   ///
@@ -161,12 +161,12 @@ class Changes<Value>: Announcable, Observable {
 
   /// In changes pipelines, we need to keep earlier stages of the pipeline alive.
   ///
-  private let retainedObservedObject: AnyObject?
+  private let retainedObservedObject: Any?
 
 
   init() { self.retainedObservedObject = nil }
 
-  init(retainObservedObject: AnyObject) { self.retainedObservedObject = retainObservedObject }
+  init(retainObservedObject: Any) { self.retainedObservedObject = retainObservedObject }
 
   /// Announce a change to all observers.
   ///
@@ -194,6 +194,59 @@ class Changes<Value>: Announcable, Observable {
   }
 }
 
+/// Proxy to allow observations without the ability to announce changes.
+///
+struct ChangesOutlet<Value>: Observable {
+  typealias ObservedValue  = Value
+
+  private let changes: Changes<Value>
+
+  // Swift compiler doesn't generate the right init in the face of the generic arguments.
+  init(changes: Changes<Value>) { self.changes = changes }
+
+  /// Registers an observer together with a context object whose lifetime determines the duration of the observation.
+  ///
+  /// The context object is stored using a weak reference. (It cannot be fully parametric as only objects can have
+  /// weak references.)
+  ///
+  /// The observer will be called on the same thread where a new value is announced.
+  ///
+  @discardableResult
+  func observe<Context : AnyObject>(withContext context: Context, observer: @escaping (Context, Value) -> ())
+    -> Observation<Value>
+  {
+    return changes.observe(withContext: context, observer: observer)
+  }
+}
+
+/// Proxy to allow announcements without the ability to observe changes.
+///
+struct ChangesInlet<Value>: Announcable {
+  typealias AnnouncedValue  = Value
+
+  private let changes: Changes<Value>
+
+  // Swift compiler doesn't generate the right init in the face of the generic arguments.
+  init(changes: Changes<Value>) { self.changes = changes }
+
+  /// Announce a change to all observers.
+  ///
+  internal func announce(change: Value) {
+    changes.announce(change: change)
+  }
+}
+
+extension Changes {
+
+  /// An inlet for the steam of changes.
+  ///
+  var inlet: ChangesInlet<Value> { return ChangesInlet(changes: self) }
+
+  /// An outlet for the steam of changes.
+  ///
+  var outlet: ChangesOutlet<Value> { return ChangesOutlet(changes: self) }
+}
+
 /// Trigger streams are changes that only convey a point in time.
 ///
 typealias Triggers = Changes<()>
@@ -204,9 +257,9 @@ typealias Triggers = Changes<()>
 class Changing<Value>: Observable {
   typealias ObservedValue = Value
 
-  private let retainedObserved: AnyObject         // This is to keep the observed object alive.
+  private     let retainedObserved: Any               // This is to keep the observed object alive.
   fileprivate var accumulator:      Value             // Encapsulated accumulator value
-  private var changes:          Changes<Value>    // Stream of accumulator changes
+  private     var changes:          Changes<Value>    // Stream of accumulator changes
 
   /// Constructs an accumulator with the given initial value, which is fed by an observed object by applying an
   /// accumulation function to the current accumulator value and the observed change to determine the new accumulator
