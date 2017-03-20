@@ -17,15 +17,25 @@ class GoalsDataSource: NSObject {
   @IBOutlet private weak var tableView: UITableView?
 
   fileprivate var goals:            Goals = []          // Cache the last model data we observed.
-  fileprivate var goalsObservation: Observation<Goals>!
+  fileprivate var goalsObservation: Observation<Goals>?
+  internal    var goalEdits:        ChangesInlet<GoalEdit>?
 
   override init() {
     super.init()
 
+    // Register with app delegate.
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    appDelegate.goalsDataSource = self
+  }
+
+  /// Configure this data source with observables and announcables to tie it into the data model.
+  ///
+  func configure(model: Changing<Goals>, edits: ChangesInlet<GoalEdit>) {
     goalsObservation = model.observe(withContext: self){ context, goals in
       context.goals = goals
       context.tableView?.reloadData()
     }
+    goalEdits = edits
   }
 
   /// Retrieve the goal at the given index path in the model data, if available.
@@ -42,8 +52,8 @@ class GoalsDataSource: NSObject {
   func add(goal: Goal) {
 
       // Add goal to the model without updating our local cache.
-    goalsObservation.disable{
-      goalEdits.announce(change: .add(goal: goal))
+    goalsObservation?.disable{
+      goalEdits?.announce(change: .add(goal: goal))
     }
 
       // Independently add it to our local model cache and the UI to properly animate.
@@ -56,7 +66,7 @@ class GoalsDataSource: NSObject {
   var goalsActivity: [Bool] { return goals.map{ $0.progress != nil } }
 
   func commitGoalsActivity(_ goalsActivity: [Bool]) {
-    goalEdits.announce(change: .setActivity(activity: goalsActivity))
+    goalEdits?.announce(change: .setActivity(activity: goalsActivity))
   }
 }
 
@@ -90,8 +100,8 @@ extension GoalsDataSource: UITableViewDataSource {
       let goal = self.goal(at: indexPath) else { return }
 
       // Remove goal from model without updating our local cache.
-    goalsObservation.disable{
-      goalEdits.announce(change: .delete(goal: goal.goal))
+    goalsObservation?.disable{
+      goalEdits?.announce(change: .delete(goal: goal.goal))
     }
 
       // Independently remove it from our local model cache and the UI to properly animate.

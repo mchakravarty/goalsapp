@@ -25,6 +25,10 @@ class DetailController: UIViewController {
     }
   }
 
+  /// Changes inlet consuming goal detail edits.
+  ///
+  var goalEdits: ChangesInlet<GoalEdit>?
+
   override func viewDidLoad() {
     super.viewDidLoad()
     updateGoalUI()
@@ -60,6 +64,6 @@ class DetailController: UIViewController {
     let newTitle = titleTextField.text ?? ""
     goal?.title  = newTitle
 
-    if let goal = goal { goalEdits.announce(change: .update(goal: goal)) }
+    if let goal = goal { goalEdits?.announce(change: .update(goal: goal)) }
   }
 }

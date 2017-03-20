@@ -212,31 +212,30 @@ typealias Edits = Changes<Edit>
 
 
 // MARK: -
-// MARK: Model store
+// MARK: Complete app model
 
-// NB: This is overly simplistic, keeping all the observables as toplevel values that can be accessed from anywhere in
-//     the app. In production code, you want to restrict access and permission to announce edits to individual
-//     subsystems of the app by passing the observables into only those data sources, views, or controllers that need
-//     the corresponding access.
+struct GoalsModel {
+
+  // The two types of edit streams
+  //
+  let goalEdits     = GoalEdits(),
+      progressEdits = ProgressEdits()
+
+  /// Combined edits
+  ///
+  let edits: Edits
 
 
-// Streams of edits.
+  /// The current model value is determined by accumulating all edits.
+  ///
+  let model: Changing<Goals>
 
-let goalEdits     = GoalEdits(),
-    progressEdits = ProgressEdits(),
-    edits: Edits  = goalEdits.merge(right: progressEdits).map{ Edit(goalOrProgressEdit: $0) }
+  init(initial: Goals) {
 
-  // FIXME: needs to be read from persistent store
-let initialGoals: Goals = [ (goal:  Goal(colour: .blue, title: "Yoga", interval: .monthly, frequency: 5),
-                             progress: 3)
-                          , (goal:  Goal(colour: .orange, title: "Walks", interval: .weekly, frequency: 3),
-                             progress: 0)
-                          , (goal:  Goal(colour: .purple, title: "Stretching", interval: .daily, frequency: 3),
-                             progress: 1)
-                          ]
-
-/// The current model value is determined by accumulating all edits.
-///
-let model: Changing<Goals> = edits.accumulate(startingFrom: initialGoals){ edit, currentGoals in
-  return edit.transform(currentGoals)
+      // Create the change propagation network
+    edits = goalEdits.merge(right: progressEdits).map{ Edit(goalOrProgressEdit: $0) }
+    model = edits.accumulate(startingFrom: initial){ edit, currentGoals in
+              return edit.transform(currentGoals)
+            }
+  }
 }

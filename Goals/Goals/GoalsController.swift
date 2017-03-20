@@ -104,7 +104,8 @@ class GoalsController: UITableViewController {
 
     if segue.identifier == kShowGoalDetail, let detailController = segue.destination as? DetailController {
 
-      detailController.goal = goalsDataSource.goal(at: indexPath)?.goal
+      detailController.goal      = goalsDataSource.goal(at: indexPath)?.goal
+      detailController.goalEdits = goalsDataSource.goalEdits      // Pass goal editing capability along
     }
   }
 }
