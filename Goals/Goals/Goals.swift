@@ -69,7 +69,7 @@ struct Goal {
 
   var frequencyPerInterval: String {
     // FIXME: use NumberFormatter to print frequency in words
-    return "\(frequency) times (\(interval.description))"
+    return "\(interval.frequency(number: frequency))"
   }
 
   /// Percentage towards achieving the goal in the current interval given a specific count of how often the task/activity
