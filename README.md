@@ -9,7 +9,7 @@ A simple iPhone app to track recurring periodic goals as an example for the appl
 ## Talks
 
 * This app served as a running example in my talk [A Type is Worth a Thousand Tests](https://speakerdeck.com/mchakravarty/a-type-is-worth-a-thousand-tests). For the version of the app that matches the description and code in that talk, please checkout the tag [one-type-thousand-tests](https://github.com/mchakravarty/goalsapp/tree/one-type-thousand-tests).
-* The current version of the app —and especially its use of [functional reactive programmming](https://github.com/mchakravarty/goalsapp/blob/master/Goals/Goals/Changes.swift)— will be discussed in my forthcoming talk at [iOSCon 2017](http://justtesting.org/post/158264281261/do-it-yourself-functional-reactive-programming).
+* The current version of the app —and especially its use of [functional reactive programmming](https://github.com/mchakravarty/goalsapp/blob/master/Goals/Goals/Changes.swift)— is the subject of my [iOSCon 2017](http://justtesting.org/post/158264281261/do-it-yourself-functional-reactive-programming) talk [Do-It-Yourself Functional Reactive Programming](https://speakerdeck.com/mchakravarty/do-it-yourself-functional-reactive-programming).
 
 ## Scope
 
