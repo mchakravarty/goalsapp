@@ -171,12 +171,14 @@
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = Z3JA6XMHD3;
 						DevelopmentTeamName = "Manuel Chakravarty";
+						LastSwiftMigration = 0910;
 						ProvisioningStyle = Automatic;
 					};
 					E7DE0CD51D1A73BC0053A00B = {
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = Z3JA6XMHD3;
 						DevelopmentTeamName = "Manuel Chakravarty";
+						LastSwiftMigration = 0910;
 						ProvisioningStyle = Automatic;
 						TestTargetID = E7DE0CBF1D1A73BC0053A00B;
 					};
@@ -388,7 +390,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.justtesting.Goals;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -401,7 +403,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.justtesting.Goals;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -413,7 +415,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.justtesting.GoalsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Goals.app/Goals";
 			};
 			name = Debug;
@@ -426,7 +428,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.justtesting.GoalsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Goals.app/Goals";
 			};
 			name = Release;
